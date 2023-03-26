@@ -1,0 +1,14 @@
+on: [ push ]
+jobs:
+  integration:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+      - id: forgejo
+        uses: https://code.forgejo.org/actions/setup-forgejo@v1
+        with:
+          image-version: 1.19
+      - run: |
+          set -ex
+          curl ${{ steps.forgejo.outputs.url }}/api/forgejo/v1/version | grep 1.19
+          ls -l forgejo-release.sh
