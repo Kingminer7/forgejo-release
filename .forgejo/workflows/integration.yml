@@ -7,8 +7,12 @@ jobs:
       - id: forgejo
         uses: https://code.forgejo.org/actions/setup-forgejo@v1
         with:
+          user: testuser
           image-version: 1.19
       - run: |
           set -ex
-          curl ${{ steps.forgejo.outputs.url }}/api/forgejo/v1/version | grep 1.19
-          ls -l forgejo-release.sh
+          curl -sS ${{ steps.forgejo.outputs.url }}/api/forgejo/v1/version | grep 1.19
+          export FORGEJO="${{ steps.forgejo.outputs.url }}"
+          export RELEASETEAMTOKEN="${{ steps.forgejo.outputs.token }}"
+          export CI_REPO_OWNER=testuser
+          testdata/forgejo-release-test.sh test_run

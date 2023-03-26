@@ -3,13 +3,10 @@
 set -ex
 
 : ${PULL_USER:=forgejo-integration}
-if test "$CI_REPO" = "forgejo/release" ; then
-    : ${PUSH_USER:=forgejo}
-else
-    : ${PUSH_USER:=forgejo-experimental}
-fi
+: ${PUSH_USER:=forgejo}
 : ${TAG:=${CI_COMMIT_TAG}}
-: ${DOMAIN:=codeberg.org}
+: ${FORGEJO:=https://codeberg.org}
+: ${REPO:=forgejo}
 : ${RELEASE_DIR:=dist/release}
 : ${BIN_DIR:=/tmp}
 : ${TEA_VERSION:=0.9.0}
@@ -23,7 +20,7 @@ setup_tea() {
 }
 
 ensure_tag() {
-    if api GET repos/$PUSH_USER/forgejo/tags/$TAG > /tmp/tag.json ; then
+    if api GET repos/$PUSH_USER/$REPO/tags/$TAG > /tmp/tag.json ; then
 	local sha=$(jq --raw-output .commit.sha < /tmp/tag.json)
 	if test "$sha" != "$CI_COMMIT_SHA" ; then
 	    cat /tmp/tag.json
@@ -31,7 +28,7 @@ ensure_tag() {
 	    false
 	fi
     else
-	api POST repos/$PUSH_USER/forgejo/tags --data-raw '{"tag_name": "'$CI_COMMIT_TAG'", "target": "'$CI_COMMIT_SHA'"}'
+	api POST repos/$PUSH_USER/$REPO/tags --data-raw '{"tag_name": "'$CI_COMMIT_TAG'", "target": "'$CI_COMMIT_SHA'"}'
     fi
 }
 
@@ -42,19 +39,19 @@ upload() {
     test ${RELEASETYPE+false} || echo "Uploading as Stable"
     ensure_tag
     anchor=$(echo $CI_COMMIT_TAG | sed -e 's/^v//' -e 's/[^a-zA-Z0-9]/-/g')
-    $BIN_DIR/tea release create $ASSETS --repo $PUSH_USER/forgejo --note "See https://codeberg.org/forgejo/forgejo/src/branch/forgejo/RELEASE-NOTES.md#${anchor}" --tag $CI_COMMIT_TAG --title $CI_COMMIT_TAG ${RELEASETYPE}
+    $BIN_DIR/tea release create $ASSETS --repo $PUSH_USER/$REPO --note "$RELEASENOTES" --tag $CI_COMMIT_TAG --title $CI_COMMIT_TAG ${RELEASETYPE}
 }
 
 push() {
     setup_api
     setup_tea
-    GITEA_SERVER_TOKEN=$RELEASETEAMTOKEN $BIN_DIR/tea login add --name $RELEASETEAMUSER --url $DOMAIN
+    GITEA_SERVER_TOKEN=$RELEASETEAMTOKEN $BIN_DIR/tea login add --name $RELEASETEAMUSER --url $FORGEJO
     upload
 }
 
 setup_api() {
-    if ! which jq || ! which curl ; then
-	apk --update --no-cache add jq curl
+    if ! which jq curl ; then
+	apt-get install -y -qq jq curl
     fi
 }
 
@@ -64,7 +61,7 @@ api() {
     path=$1
     shift
 
-    curl --fail -X $method -sS -H "Content-Type: application/json" -H "Authorization: token $RELEASETEAMTOKEN" "$@" https://$DOMAIN/api/v1/$path
+    curl --fail -X $method -sS -H "Content-Type: application/json" -H "Authorization: token $RELEASETEAMTOKEN" "$@" $FORGEJO/api/v1/$path
 }
 
 pull() {
@@ -72,7 +69,7 @@ pull() {
     (
 	mkdir -p $RELEASE_DIR
 	cd $RELEASE_DIR
-	api GET repos/$PULL_USER/forgejo/releases/tags/$TAG > /tmp/assets.json
+	api GET repos/$PULL_USER/$REPO/releases/tags/$TAG > /tmp/assets.json
 	jq --raw-output '.assets[] | "\(.name) \(.browser_download_url)"' < /tmp/assets.json | while read name url ; do
 	    wget --quiet -O $name $url
 	done
