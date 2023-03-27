@@ -30,7 +30,8 @@ function wait_success() {
 	if check_status "$forgejo" "$repo" "$sha"; then
 	    break
 	fi
-	sleep 5
+	tail $FORGEJO_RUNNER_LOGS
+	sleep 10
     done
     if ! test "$(check_status "$forgejo" "$repo" "$sha")" = "success" ; then
 	cat $FORGEJO_RUNNER_LOGS
