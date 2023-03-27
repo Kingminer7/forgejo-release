@@ -2,6 +2,7 @@
 
 set -ex
 
+: ${FORGEJO_RUNNER_LOGS:=../setup-forgejo/forgejo-runner.log}
 DATA=$(dirname $0)
 DIR=$(mktemp -d)
 
@@ -32,7 +33,7 @@ function wait_success() {
 	sleep 5
     done
     if ! test "$(check_status "$forgejo" "$repo" "$sha")" = "success" ; then
-	cat forgejo-runner.log
+	cat $FORGEJO_RUNNER_LOGS
 	return 1
     fi
 }

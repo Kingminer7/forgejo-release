@@ -12,6 +12,7 @@ jobs:
           image-version: 1.19
       - name: 001
         run: |
+          export FORGEJO_RUNNER_LOGS="${{ steps.forgejo.outputs.runner-logs }}"
           testdata/run.sh push_self http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }} testuser setup-forgejo-release
           testdata/run.sh workflow http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }} testuser try-setup-forgejo-release
       - name: 002
