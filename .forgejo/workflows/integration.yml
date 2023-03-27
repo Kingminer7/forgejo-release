@@ -8,8 +8,14 @@ jobs:
         uses: https://code.forgejo.org/actions/setup-forgejo@v1
         with:
           user: testuser
+          password: admin1234
           image-version: 1.19
-      - run: |
+      - name: 001
+        run: |
+          testdata/run.sh push_self http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }} testuser setup-forgejo-release
+          testdata/run.sh workflow http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }} testuser try-setup-forgejo-release
+      - name: 002
+        run: |
           set -ex
           curl -sS ${{ steps.forgejo.outputs.url }}/api/forgejo/v1/version | grep 1.19
           export FORGEJO="${{ steps.forgejo.outputs.url }}"
