@@ -1,16 +1,14 @@
 #!/bin/bash
 
-set -ex
+set -e
 
-: ${PULL_USER:=forgejo-integration}
-: ${PUSH_USER:=forgejo}
-: ${TAG:=${CI_COMMIT_TAG}}
+if ${VERBOSE:-false}; then set -x; fi
+
 : ${FORGEJO:=https://codeberg.org}
-: ${REPO:=forgejo}
+: ${REPO:=forgejo-integration/forgejo}
 : ${RELEASE_DIR:=dist/release}
-: ${BIN_DIR:=/tmp}
+: ${BIN_DIR:=$(mktemp -d)}
 : ${TEA_VERSION:=0.9.0}
-
 
 setup_tea() {
     if ! test -f $BIN_DIR/tea ; then
@@ -20,33 +18,38 @@ setup_tea() {
 }
 
 ensure_tag() {
-    if api GET repos/$PUSH_USER/$REPO/tags/$TAG > /tmp/tag.json ; then
+    if api GET repos/$REPO/tags/$TAG > /tmp/tag.json ; then
 	local sha=$(jq --raw-output .commit.sha < /tmp/tag.json)
-	if test "$sha" != "$CI_COMMIT_SHA" ; then
+	if test "$sha" != "$SHA" ; then
 	    cat /tmp/tag.json
-	    echo "the tag SHA in the $PUSH_USER repository does not match the tag SHA that triggered the build: $CI_COMMIT_SHA"
+	    echo "the tag SHA in the $REPO repository does not match the tag SHA that triggered the build: $SHA"
 	    false
 	fi
     else
-	api POST repos/$PUSH_USER/$REPO/tags --data-raw '{"tag_name": "'$CI_COMMIT_TAG'", "target": "'$CI_COMMIT_SHA'"}'
+	api POST repos/$REPO/tags --data-raw '{"tag_name": "'$TAG'", "target": "'$SHA'"}'
     fi
 }
 
-upload() {
-    ASSETS=$(ls $RELEASE_DIR/* | sed -e 's/^/-a /')
-    echo "${CI_COMMIT_TAG}" | grep -qi '\-rc' && export RELEASETYPE="--prerelease" && echo "Uploading as Pre-Release"
-    echo "${CI_COMMIT_TAG}" | grep -qi '\-test' && export RELEASETYPE="--draft" && echo "Uploading as Draft"
-    test ${RELEASETYPE+false} || echo "Uploading as Stable"
+upload_release() {
+    local assets=$(ls $RELEASE_DIR/* | sed -e 's/^/-a /')
+    local releasetype
+    echo "${TAG}" | grep -qi '\-rc' && export releasetype="--prerelease" && echo "Uploading as Pre-Release"
+    echo "${TAG}" | grep -qi '\-test' && export releasetype="--draft" && echo "Uploading as Draft"
+    test ${releasetype+false} || echo "Uploading as Stable"
     ensure_tag
-    anchor=$(echo $CI_COMMIT_TAG | sed -e 's/^v//' -e 's/[^a-zA-Z0-9]/-/g')
-    $BIN_DIR/tea release create $ASSETS --repo $PUSH_USER/$REPO --note "$RELEASENOTES" --tag $CI_COMMIT_TAG --title $CI_COMMIT_TAG ${RELEASETYPE}
+    anchor=$(echo $TAG | sed -e 's/^v//' -e 's/[^a-zA-Z0-9]/-/g')
+    $BIN_DIR/tea release create $assets --repo $REPO --note "$RELEASENOTES" --tag $TAG --title $TAG ${releasetype}
 }
 
-push() {
+upload() {
     setup_api
     setup_tea
-    GITEA_SERVER_TOKEN=$RELEASETEAMTOKEN $BIN_DIR/tea login add --name $RELEASETEAMUSER --url $FORGEJO
-    upload
+    if ! test "$DOER"; then
+	echo 'missing DOER'
+	return 1
+    fi
+    GITEA_SERVER_TOKEN=$TOKEN $BIN_DIR/tea login add --name $DOER --url $FORGEJO
+    upload_release
 }
 
 setup_api() {
@@ -61,15 +64,15 @@ api() {
     path=$1
     shift
 
-    curl --fail -X $method -sS -H "Content-Type: application/json" -H "Authorization: token $RELEASETEAMTOKEN" "$@" $FORGEJO/api/v1/$path
+    curl --fail -X $method -sS -H "Content-Type: application/json" -H "Authorization: token $TOKEN" "$@" $FORGEJO/api/v1/$path
 }
 
-pull() {
+download() {
     setup_api
     (
 	mkdir -p $RELEASE_DIR
 	cd $RELEASE_DIR
-	api GET repos/$PULL_USER/$REPO/releases/tags/$TAG > /tmp/assets.json
+	api GET repos/$REPO/releases/tags/$TAG > /tmp/assets.json
 	jq --raw-output '.assets[] | "\(.name) \(.browser_download_url)"' < /tmp/assets.json | while read name url ; do
 	    wget --quiet -O $name $url
 	done
@@ -78,7 +81,7 @@ pull() {
 
 
 missing() {
-    echo need pull or push argument got nothing
+    echo need upload or download argument got nothing
     exit 1
 }
 

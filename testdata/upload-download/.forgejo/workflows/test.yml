@@ -1,0 +1,36 @@
+name: Upload a Forgejo Release
+on: [push]
+jobs:
+  setup-forgejo:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+      - id: forgejo
+        uses: https://code.forgejo.org/actions/setup-forgejo@v1
+        with:
+          user: root
+          password: admin1234
+      - id: release-upload
+        uses: SELF@vTest
+        with:
+          direction: upload
+          url: ${{ steps.forgejo.outputs.url }}
+          repo: root/upload-download
+          tag: v1.0
+          doer: root
+          token: ${{ steps.forgejo.outputs.token }}
+          release-dir: upload-dir
+          verbose: true
+      - id: release-download
+        uses: SELF@vTest
+        with:
+          direction: download
+          url: ${{ steps.forgejo.outputs.url }}
+          repo: root/upload-download
+          tag: v1.0
+          doer: root
+          token: ${{ steps.forgejo.outputs.token }}
+          release-dir: download-dir
+          verbose: true
+      - run: |
+          diff -u upload-dir download-dir

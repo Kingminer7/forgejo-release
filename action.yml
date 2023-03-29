@@ -1,10 +1,45 @@
-name: 'Setup Forgejo release tools'
+name: 'Forgejo release download and upload'
 author: 'Forgejo authors'
 description: |
-  Install dependencies of the forgejo-release-upload and forgejo-release-download
-  actions.
+  Upload or download the assets of a release to a Forgejo instance.
+inputs:
+  url:
+    description: 'URL of the Forgejo instance'
+    required: true
+  repo:
+    description: 'owner/project relative to the URL'
+    required: true
+  tag:
+    description: 'Tag of the release'
+    required: true
+  doer:
+    description: 'Forgejo user authoring the upload'
+  token:
+    description: 'Forgejo application token'
+    required: true
+  release-dir:
+    description: 'Directory in whichs release assets are uploaded or downloaded'
+    required: true
+  direction:
+    description: 'Can either be download or upload'
+    required: true
+  verbose:
+    description: 'Increase the verbosity level'
+    default: 'false'
+  
 runs:
   using: "composite"
   steps:
     - run: echo "${{ github.action_path }}" >> $GITHUB_PATH
+      shell: bash
+    - run: |
+        export FORGEJO="${{ inputs.url }}"
+        export REPO="${{ inputs.repo }}"
+        export TAG="${{ inputs.tag }}"
+        export DOER="${{ inputs.doer }}"
+        export TOKEN="${{ inputs.token }}"
+        export RELEASE_DIR="${{ inputs.release-dir }}"
+        export VERBOSE="${{ inputs.verbose }}"
+        export SHA="${{ github.sha }}"
+        forgejo-release.sh ${{ inputs.direction }}
       shell: bash
