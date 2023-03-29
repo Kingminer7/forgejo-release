@@ -20,6 +20,7 @@ jobs:
         run: |
           set -ex
           export FORGEJO="${{ steps.forgejo.outputs.url }}"
-          export RELEASETEAMTOKEN="${{ steps.forgejo.outputs.token }}"
-          export CI_REPO_OWNER=testuser
-          testdata/forgejo-release-test.sh test_run
+          export TOKEN="${{ steps.forgejo.outputs.token }}"
+          export DOER=testuser
+          export VERBOSE=true
+          testdata/forgejo-release-test.sh test_run testuser otherrepo
