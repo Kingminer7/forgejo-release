@@ -8,16 +8,18 @@ jobs:
       - id: forgejo
         uses: https://code.forgejo.org/actions/setup-forgejo@v1
         with:
-          user: root
+          user: testuser
           password: admin1234
+      - run: |
+          forgejo-test-helper.sh push testrepo http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }} testuser testrepo
       - id: release-upload
         uses: SELF@vTest
         with:
           direction: upload
           url: ${{ steps.forgejo.outputs.url }}
-          repo: root/upload-download
+          repo: testuser/testrepo
           tag: v1.0
-          doer: root
+          doer: testuser
           token: ${{ steps.forgejo.outputs.token }}
           release-dir: upload-dir
           verbose: true
@@ -26,9 +28,9 @@ jobs:
         with:
           direction: download
           url: ${{ steps.forgejo.outputs.url }}
-          repo: root/upload-download
+          repo: testuser/testrepo
           tag: v1.0
-          doer: root
+          doer: testuser
           token: ${{ steps.forgejo.outputs.token }}
           release-dir: download-dir
           verbose: true
