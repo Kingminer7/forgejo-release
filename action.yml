@@ -12,6 +12,8 @@ inputs:
   tag:
     description: 'Tag of the release'
     required: true
+  sha:
+    description: 'SHA of the release'
   doer:
     description: 'Forgejo user authoring the upload'
   token:
@@ -40,6 +42,9 @@ runs:
         export TOKEN="${{ inputs.token }}"
         export RELEASE_DIR="${{ inputs.release-dir }}"
         export VERBOSE="${{ inputs.verbose }}"
-        export SHA="${{ github.sha }}"
+        export SHA="${{ inputs.sha }}"
+        if test -z "$SHA"; then
+          export SHA="${{ github.sha }}"
+        fi
         forgejo-release.sh ${{ inputs.direction }}
       shell: bash
