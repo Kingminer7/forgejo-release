@@ -22,6 +22,8 @@ inputs:
   release-dir:
     description: 'Directory in whichs release assets are uploaded or downloaded'
     required: true
+  release-notes:
+    description: 'Release notes'
   direction:
     description: 'Can either be download or upload'
     required: true
@@ -41,6 +43,7 @@ runs:
         export DOER="${{ inputs.doer }}"
         export TOKEN="${{ inputs.token }}"
         export RELEASE_DIR="${{ inputs.release-dir }}"
+        export RELEASENOTES="${{ inputs.release-notes }}"
         export VERBOSE="${{ inputs.verbose }}"
         export SHA="${{ inputs.sha }}"
         if test -z "$SHA"; then
