@@ -8,7 +8,6 @@ jobs:
       - id: release-upload
         uses: SELF@vTest
         with:
-          url: FORGEJO_URL
           direction: upload
           tag: v1.0
           doer: testuser
@@ -18,7 +17,6 @@ jobs:
       - id: release-download
         uses: SELF@vTest
         with:
-          url: FORGEJO_URL
           direction: download
           tag: v1.0
           doer: testuser

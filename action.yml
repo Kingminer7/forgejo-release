@@ -36,8 +36,11 @@ runs:
     - run: |
         export FORGEJO="${{ inputs.url }}"
         if test -z "$FORGEJO"; then
-          export FORGEJO="${{ github.server_url }}"
+          export FORGEJO="${{ env.GITHUB_SERVER_URL }}"
         fi
+        # A trailing / will mean http://forgejo//api/v1 is used
+        # and it always 401 as of v1.19, because of the double slash
+        FORGEJO=${FORGEJO%%/}
         export REPO="${{ inputs.repo }}"
         if test -z "$REPO"; then
           export REPO="${{ github.repository }}"
