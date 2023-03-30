@@ -10,6 +10,7 @@ jobs:
         with:
           direction: upload
           tag: v1.0
+          token: FORGEJO_TOKEN
           doer: testuser
           release-dir: upload-dir
           release-notes: "RELEASE NOTES"
@@ -19,6 +20,7 @@ jobs:
         with:
           direction: download
           tag: v1.0
+          token: FORGEJO_TOKEN
           doer: testuser
           release-dir: download-dir
           verbose: true
