@@ -54,6 +54,7 @@ upload() {
 
 setup_api() {
     if ! which jq curl ; then
+	apt-get -qq update
 	apt-get install -y -qq jq curl wget
     fi
 }
