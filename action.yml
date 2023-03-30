@@ -9,7 +9,6 @@ inputs:
     description: 'owner/project relative to the URL'
   tag:
     description: 'Tag of the release'
-    required: true
   sha:
     description: 'SHA of the release'
   doer:
@@ -44,6 +43,9 @@ runs:
           export REPO="${{ github.repository }}"
         fi
         export TAG="${{ inputs.tag }}"
+        if test -z "$TAG"; then
+          export TAG="${{ github.ref_name }}"
+        fi
         export DOER="${{ inputs.doer }}"
         export TOKEN="${{ inputs.token }}"
         if test -z "$TOKEN"; then
