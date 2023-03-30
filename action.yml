@@ -51,13 +51,6 @@ runs:
           TAG=${TAG##refs/tags/}
         fi
         export TOKEN="${{ inputs.token }}"
-        if test -z "$TOKEN"; then
-          export TOKEN="${{ secrets.GITHUB_TOKEN }}"
-        fi
-        if test -z "$TOKEN"; then
-          export TOKEN="${{ github.token }}"
-        fi
-        test "$TOKEN"
         export RELEASE_DIR="${{ inputs.release-dir }}"
         export RELEASENOTES="${{ inputs.release-notes }}"
         export VERBOSE="${{ inputs.verbose }}"
