@@ -44,11 +44,7 @@ upload_release() {
 upload() {
     setup_api
     setup_tea
-    if ! test "$DOER"; then
-	echo 'missing DOER'
-	return 1
-    fi
-    GITEA_SERVER_TOKEN=$TOKEN $BIN_DIR/tea login add --name $DOER --url $FORGEJO
+    GITEA_SERVER_TOKEN=$TOKEN $BIN_DIR/tea login add --url $FORGEJO
     upload_release
 }
 

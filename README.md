@@ -14,7 +14,6 @@ Upload or download the assets of a release to a Forgejo instance.
 | repo | owner/project relative to the URL | `false` |  |
 | tag | Tag of the release | `false` |  |
 | sha | SHA of the release | `false` |  |
-| doer | Forgejo user authoring the upload | `false` |  |
 | token | Forgejo application token | `true` |  |
 | release-dir | Directory in whichs release assets are uploaded or downloaded | `true` |  |
 | release-notes | Release notes | `false` |  |

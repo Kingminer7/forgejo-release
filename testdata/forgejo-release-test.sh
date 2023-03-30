@@ -69,7 +69,6 @@ test_run() {
     echo "================================ TEST END"
 }
 
-: ${DOER:=root}
 : ${TAG:=v17.8.20-1}
 
 . $(dirname $0)/../forgejo-release.sh

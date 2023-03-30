@@ -11,8 +11,6 @@ inputs:
     description: 'Tag of the release'
   sha:
     description: 'SHA of the release'
-  doer:
-    description: 'Forgejo user authoring the upload'
   token:
     description: 'Forgejo application token'
     required: true
@@ -49,7 +47,6 @@ runs:
         if test -z "$TAG"; then
           export TAG="${{ github.ref_name }}"
         fi
-        export DOER="${{ inputs.doer }}"
         export TOKEN="${{ inputs.token }}"
         if test -z "$TOKEN"; then
           export TOKEN="${{ secrets.GITHUB_TOKEN }}"

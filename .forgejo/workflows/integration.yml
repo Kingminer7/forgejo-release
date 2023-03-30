@@ -30,6 +30,5 @@ jobs:
           set -ex
           export FORGEJO="${{ steps.forgejo.outputs.url }}"
           export TOKEN="${{ steps.forgejo.outputs.token }}"
-          export DOER=testuser
           export VERBOSE=true
           testdata/forgejo-release-test.sh test_run testuser otherrepo

@@ -23,7 +23,6 @@ jobs:
           repo: testuser/testrepo
           tag: v1.0
           sha: ${{ steps.testrepo.outputs.sha }}
-          doer: testuser
           token: ${{ steps.forgejo.outputs.token }}
           release-dir: upload-dir
           release-notes: "RELEASE NOTES"
@@ -35,7 +34,6 @@ jobs:
           url: ${{ steps.forgejo.outputs.url }}
           repo: testuser/testrepo
           tag: v1.0
-          doer: testuser
           token: ${{ steps.forgejo.outputs.token }}
           release-dir: download-dir
           verbose: true
