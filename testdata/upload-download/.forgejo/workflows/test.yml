@@ -1,0 +1,28 @@
+name: Upload & Download a Forgejo Release
+on: [push]
+jobs:
+  setup-forgejo:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+      - id: release-upload
+        uses: SELF@vTest
+        with:
+          url: FORGEJO_URL
+          direction: upload
+          tag: v1.0
+          doer: testuser
+          release-dir: upload-dir
+          release-notes: "RELEASE NOTES"
+          verbose: true
+      - id: release-download
+        uses: SELF@vTest
+        with:
+          url: FORGEJO_URL
+          direction: download
+          tag: v1.0
+          doer: testuser
+          release-dir: download-dir
+          verbose: true
+      - run: |
+          diff -u upload-dir download-dir

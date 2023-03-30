@@ -5,10 +5,8 @@ description: |
 inputs:
   url:
     description: 'URL of the Forgejo instance'
-    required: true
   repo:
     description: 'owner/project relative to the URL'
-    required: true
   tag:
     description: 'Tag of the release'
     required: true
@@ -38,13 +36,27 @@ runs:
       shell: bash
     - run: |
         export FORGEJO="${{ inputs.url }}"
+        if test -z "$FORGEJO"; then
+          export FORGEJO="${{ github.server_url }}"
+        fi
         export REPO="${{ inputs.repo }}"
+        if test -z "$REPO"; then
+          export REPO="${{ github.repository }}"
+        fi
         export TAG="${{ inputs.tag }}"
         export DOER="${{ inputs.doer }}"
         export TOKEN="${{ inputs.token }}"
+        if test -z "$TOKEN"; then
+          export TOKEN="${{ github.token }}"
+        fi
+        if test -z "$TOKEN"; then
+          export TOKEN="${{ secrets.GITHUB_TOKEN }}"
+        fi
+        test "$TOKEN"
         export RELEASE_DIR="${{ inputs.release-dir }}"
         export RELEASENOTES="${{ inputs.release-notes }}"
         export VERBOSE="${{ inputs.verbose }}"
+
         export SHA="${{ inputs.sha }}"
         if test -z "$SHA"; then
           export SHA="${{ github.sha }}"
