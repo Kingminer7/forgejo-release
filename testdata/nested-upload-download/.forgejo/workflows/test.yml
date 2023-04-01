@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 name: Upload & Download a Forgejo Release
 on: [push]
 jobs:

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 name: 'Forgejo release download and upload'
 author: 'Forgejo authors'
 description: |
