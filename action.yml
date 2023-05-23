@@ -27,6 +27,8 @@ inputs:
     description: 'GPG Private Key to sign the release artifacts'
   gpg-passphrase:
     description: 'Passphrase of the GPG Private Key'
+  download-retry:
+    description: 'Number of times to retry if the release is not ready (default 1)'
   verbose:
     description: 'Increase the verbosity level'
     default: 'false'
@@ -70,6 +72,8 @@ runs:
         fi
 
         export VERBOSE="${{ inputs.verbose }}"
+
+        export RETRY="${{ inputs.download-retry }}"
 
         forgejo-release.sh ${{ inputs.direction }}
       shell: bash

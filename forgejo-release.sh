@@ -10,6 +10,8 @@ if ${VERBOSE:-false}; then set -x; fi
 : ${RELEASE_DIR:=dist/release}
 : ${BIN_DIR:=$(mktemp -d)}
 : ${TEA_VERSION:=0.9.0}
+: ${RETRY:=1}
+: ${DELAY:=10}
 
 setup_tea() {
     if ! test -f $BIN_DIR/tea ; then
@@ -72,8 +74,30 @@ api() {
     curl --fail -X $method -sS -H "Content-Type: application/json" -H "Authorization: token $TOKEN" "$@" $FORGEJO/api/v1/$path
 }
 
+wait_release() {
+    local ready=false
+    for i in $(seq $RETRY); do
+	if api GET repos/$REPO/releases/tags/$TAG | jq --raw-output .draft > /tmp/draft; then
+	    if test "$(cat /tmp/draft)" = "false"; then
+		ready=true
+		break
+	    fi
+	    echo "release $TAG is still a draft"
+	else
+	    echo "release $TAG does not exist yet"
+	fi
+	echo "waiting $DELAY seconds"
+	sleep $DELAY
+    done
+    if ! $ready ; then
+	echo "no release for $TAG"
+	return 1
+    fi
+}
+
 download() {
     setup_api
+    wait_release
     (
 	mkdir -p $RELEASE_DIR
 	cd $RELEASE_DIR

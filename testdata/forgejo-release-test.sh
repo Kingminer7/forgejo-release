@@ -32,6 +32,16 @@ test_setup() {
     touch $RELEASE_DIR/file-two.txt
 }
 
+test_wait_release_fail() {
+    ! wait_release
+}
+
+test_wait_release() {
+    wait_release
+    release_draft true
+    ! wait_release
+}
+
 test_ensure_tag() {
     api DELETE repos/$REPO/tags/$TAG || true
     #
@@ -62,12 +72,15 @@ test_run() {
     REPO=$user/$project
     test_setup $project
     test_ensure_tag
+    DELAY=0
+    test_wait_release_fail
     echo "================================ TEST BEGIN"
     upload
     RELEASE_DIR=$pulled
     download
     diff -r $to_push $pulled
     echo "================================ TEST END"
+    test_wait_release
 }
 
 : ${TAG:=v17.8.20-1}
