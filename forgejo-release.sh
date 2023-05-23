@@ -35,11 +35,18 @@ upload_release() {
     local assets=$(ls $RELEASE_DIR/* | sed -e 's/^/-a /')
     local releasetype
     echo "${TAG}" | grep -qi '\-rc' && export releasetype="--prerelease" && echo "Uploading as Pre-Release"
-    echo "${TAG}" | grep -qi '\-test' && export releasetype="--draft" && echo "Uploading as Draft"
     test ${releasetype+false} || echo "Uploading as Stable"
     ensure_tag
     anchor=$(echo $TAG | sed -e 's/^v//' -e 's/[^a-zA-Z0-9]/-/g')
-    $BIN_DIR/tea release create $assets --repo $REPO --note "$RELEASENOTES" --tag $TAG --title $TAG ${releasetype}
+    $BIN_DIR/tea release create $assets --repo $REPO --note "$RELEASENOTES" --tag $TAG --title $TAG --draft ${releasetype}
+    release_draft false
+}
+
+release_draft() {
+    local state="$1"
+
+    local id=$(api GET repos/$REPO/releases/tags/$TAG | jq --raw-output .id)
+    api PATCH repos/$REPO/releases/$id --data-raw '{"draft": '$state'}'
 }
 
 upload() {
