@@ -23,6 +23,10 @@ inputs:
   direction:
     description: 'Can either be download or upload'
     required: true
+  gpg-private-key:
+    description: 'GPG Private Key to sign the release artifacts'
+  gpg-passphrase:
+    description: 'Passphrase of the GPG Private Key'
   verbose:
     description: 'Increase the verbosity level'
     default: 'false'
