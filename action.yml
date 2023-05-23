@@ -40,10 +40,12 @@ runs:
         # A trailing / will mean http://forgejo//api/v1 is used
         # and it always 401 as of v1.19, because of the double slash
         FORGEJO=${FORGEJO%%/}
+
         export REPO="${{ inputs.repo }}"
         if test -z "$REPO"; then
           export REPO="${{ github.repository }}"
         fi
+
         export TAG="${{ inputs.tag }}"
         if test -z "$TAG"; then
           export TAG="${{ github.ref_name }}"
@@ -51,14 +53,19 @@ runs:
           # trim refs/tags/
           TAG=${TAG##refs/tags/}
         fi
+
         export TOKEN="${{ inputs.token }}"
+
         export RELEASE_DIR="${{ inputs.release-dir }}"
+
         export RELEASENOTES="${{ inputs.release-notes }}"
-        export VERBOSE="${{ inputs.verbose }}"
 
         export SHA="${{ inputs.sha }}"
         if test -z "$SHA"; then
           export SHA="${{ github.sha }}"
         fi
+
+        export VERBOSE="${{ inputs.verbose }}"
+
         forgejo-release.sh ${{ inputs.direction }}
       shell: bash
