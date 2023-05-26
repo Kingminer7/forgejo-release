@@ -1,0 +1,10 @@
+on: [ push ]
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Unit tests of the supporting script forgejo-release.sh
+        run: |
+          testdata/forgejo-release-test.sh test_maybe_sign_release

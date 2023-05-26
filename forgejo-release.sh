@@ -8,10 +8,14 @@ if ${VERBOSE:-false}; then set -x; fi
 : ${FORGEJO:=https://codeberg.org}
 : ${REPO:=forgejo-integration/forgejo}
 : ${RELEASE_DIR:=dist/release}
-: ${BIN_DIR:=$(mktemp -d)}
+: ${TMP_DIR:=$(mktemp -d)}
+: ${GNUPGHOME:=$TMP_DIR}
+: ${BIN_DIR:=$TMP_DIR}
 : ${TEA_VERSION:=0.9.0}
 : ${RETRY:=1}
 : ${DELAY:=10}
+
+export GNUPGHOME
 
 setup_tea() {
     if ! test -f $BIN_DIR/tea ; then
@@ -21,10 +25,10 @@ setup_tea() {
 }
 
 ensure_tag() {
-    if api GET repos/$REPO/tags/$TAG > /tmp/tag.json ; then
-	local sha=$(jq --raw-output .commit.sha < /tmp/tag.json)
+    if api GET repos/$REPO/tags/$TAG > $TMP_DIR/tag.json ; then
+	local sha=$(jq --raw-output .commit.sha < $TMP_DIR/tag.json)
 	if test "$sha" != "$SHA" ; then
-	    cat /tmp/tag.json
+	    cat $TMP_DIR/tag.json
 	    echo "the tag SHA in the $REPO repository does not match the tag SHA that triggered the build: $SHA"
 	    false
 	fi
@@ -51,10 +55,31 @@ release_draft() {
     api PATCH repos/$REPO/releases/$id --data-raw '{"draft": '$state'}'
 }
 
+sign_release() {
+    local passphrase
+    if test -s "$GPG_PASSPHRASE"; then
+	passphrase="--passphrase-file $GPG_PASSPHRASE"
+    fi
+    gpg --import --no-tty --pinentry-mode loopback $passphrase "$GPG_PRIVATE_KEY"
+    for asset in $RELEASE_DIR/* ; do
+	if [[ $asset =~ .sha256$ ]] ; then
+	    continue
+	fi
+	gpg --armor --detach-sign --no-tty --pinentry-mode loopback $passphrase < $asset > $asset.asc
+    done
+}
+
+maybe_sign_release() {
+    if test -s "$GPG_PRIVATE_KEY"; then
+	sign_release
+    fi
+}
+
 upload() {
     setup_api
     setup_tea
     GITEA_SERVER_TOKEN=$TOKEN $BIN_DIR/tea login add --url $FORGEJO
+    maybe_sign_release
     upload_release
 }
 
@@ -77,8 +102,8 @@ api() {
 wait_release() {
     local ready=false
     for i in $(seq $RETRY); do
-	if api GET repos/$REPO/releases/tags/$TAG | jq --raw-output .draft > /tmp/draft; then
-	    if test "$(cat /tmp/draft)" = "false"; then
+	if api GET repos/$REPO/releases/tags/$TAG | jq --raw-output .draft > $TMP_DIR/draft; then
+	    if test "$(cat $TMP_DIR/draft)" = "false"; then
 		ready=true
 		break
 	    fi
@@ -101,8 +126,8 @@ download() {
     (
 	mkdir -p $RELEASE_DIR
 	cd $RELEASE_DIR
-	api GET repos/$REPO/releases/tags/$TAG > /tmp/assets.json
-	jq --raw-output '.assets[] | "\(.name) \(.browser_download_url)"' < /tmp/assets.json | while read name url ; do
+	api GET repos/$REPO/releases/tags/$TAG > $TMP_DIR/assets.json
+	jq --raw-output '.assets[] | "\(.name) \(.browser_download_url)"' < $TMP_DIR/assets.json | while read name url ; do
 	    wget --quiet -O $name $url
 	done
     )
