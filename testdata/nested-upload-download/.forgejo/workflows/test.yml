@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MIT
-name: Upload & Download a Forgejo Release
+
+name: Upload (and download) a release to (and from) a project found in a Forgejo instance that is different from the one running the workflow
 on: [push]
 jobs:
   setup-forgejo:

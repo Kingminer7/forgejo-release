@@ -1,0 +1,117 @@
+# SPDX-License-Identifier: MIT
+
+name: Upload/download a signed release (no GPG passphrase)
+on: [push]
+env:
+  gpg_private_key: |
+    -----BEGIN PGP PRIVATE KEY BLOCK-----
+    
+    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
+    =5CPG
+    -----END PGP PRIVATE KEY BLOCK-----
+
+jobs:
+  upload-gpg-no-passphrase:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        id: release-upload
+        uses: SELF@vTest
+        with:
+          direction: upload
+          tag: v1.2
+          token: FORGEJO_TOKEN
+          release-dir: upload-dir
+          release-notes: "RELEASE NOTES"
+          gpg-private-key: ${{ env.gpg_private_key }}
+          verbose: true
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        id: release-download
+        uses: SELF@vTest
+        with:
+          direction: download
+          tag: v1.2
+          token: FORGEJO_TOKEN
+          release-dir: download-dir
+          verbose: true
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        run: |
+          test "$(find download-dir -name '*.asc')"
+          diff -u upload-dir download-dir

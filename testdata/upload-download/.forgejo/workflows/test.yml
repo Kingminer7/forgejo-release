@@ -1,12 +1,9 @@
-#
-# The following:
-# if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-# is a workaround until https://codeberg.org/forgejo/forgejo/issues/608 is fixed
-#
-name: Upload & Download a Forgejo Release
+# SPDX-License-Identifier: MIT
+
+name: Upload (and download) a release to (and from) the project that runs the workflow
 on: [push]
 jobs:
-  setup-forgejo:
+  upload-download:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3

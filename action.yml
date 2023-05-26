@@ -75,5 +75,13 @@ runs:
 
         export RETRY="${{ inputs.download-retry }}"
 
+        export TMP_DIR=$(mktemp -d)
+        trap "rm -fr $TMP_DIR" EXIT
+
+        echo -n "${{ inputs.gpg-private-key }}" > $TMP_DIR/gpg-private-key
+        export GPG_PRIVATE_KEY=$TMP_DIR/gpg-private-key
+        echo -n "${{ inputs.gpg-passphrase }}" > $TMP_DIR/gpg-passphrase
+        export GPG_PASSPHRASE="$TMP_DIR/gpg-passphrase"
+
         forgejo-release.sh ${{ inputs.direction }}
       shell: bash
