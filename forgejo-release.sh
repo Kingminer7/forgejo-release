@@ -78,6 +78,7 @@ maybe_sign_release() {
 upload() {
     setup_api
     setup_tea
+    rm -f ~/.config/tea/config.yml
     GITEA_SERVER_TOKEN=$TOKEN $BIN_DIR/tea login add --url $FORGEJO
     maybe_sign_release
     upload_release
