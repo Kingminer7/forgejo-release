@@ -1,6 +1,10 @@
 # SPDX-License-Identifier: MIT
 
-name: Upload (and download) a release to (and from) a project found in a Forgejo instance that is different from the one running the workflow
+#
+# Upload (and download) a release to (and from) a project
+# found in a Forgejo instance that is different from the one running the workflow
+#
+name: two Forgejo
 on: [push]
 jobs:
   setup-forgejo:
@@ -13,6 +17,7 @@ jobs:
           user: testuser
           password: admin1234
           lxc-ip-prefix: 10.0.15
+          image-version: 1.20
       - id: testrepo
         run: |
           forgejo-test-helper.sh push testrepo http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }} testuser testrepo > /tmp/output
@@ -41,3 +46,5 @@ jobs:
           verbose: true
       - run: |
           diff -u upload-dir download-dir
+      - if: failure()
+        run: docker logs forgejo

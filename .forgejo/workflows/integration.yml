@@ -10,26 +10,29 @@ jobs:
         with:
           user: testuser
           password: admin1234
-          image-version: 1.19
+          image-version: 1.20
 
-      - name: Make the forgejo-release action available for testing
+      - name: push self
         run: |
           forgejo-test-helper.sh push_self_action http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }} testuser forgejo-release vTest
 
-      - name: Actions tests from testdata/upload-download/.forgejo/workflows
+      - name: testdata/upload-download
         run: |
           export FORGEJO_RUNNER_LOGS="${{ steps.forgejo.outputs.runner-logs }}"
           forgejo-test-helper.sh run_workflow testdata/upload-download http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }} testuser upload-download forgejo-release "${{ steps.forgejo.outputs.token }}"
 
-      - name: Actions tests from testdata/nested-upload-download/.forgejo/workflows
+      - name: testdata/nested-upload-download
         run: |
           export FORGEJO_RUNNER_LOGS="${{ steps.forgejo.outputs.runner-logs }}"
           forgejo-test-helper.sh run_workflow testdata/nested-upload-download http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }} testuser nested-upload-download forgejo-release "${{ steps.forgejo.outputs.token }}"
 
-      - name: Integration tests of the supporting script forgejo-release.sh
+      - name: test forgejo-release.sh
         run: |
           set -ex
           export FORGEJO="${{ steps.forgejo.outputs.url }}"
           export TOKEN="${{ steps.forgejo.outputs.token }}"
           export VERBOSE=true
           testdata/forgejo-release-test.sh test_run testuser otherrepo
+
+      - if: failure()
+        run: docker logs forgejo
