@@ -33,3 +33,6 @@ jobs:
           export TOKEN="${{ steps.forgejo.outputs.token }}"
           export VERBOSE=true
           testdata/forgejo-release-test.sh test_run testuser otherrepo
+
+      - if: failure()
+        run: docker logs forgejo
