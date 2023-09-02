@@ -44,7 +44,16 @@ upload_release() {
     test ${releasetype+false} || echo "Uploading as Stable"
     ensure_tag
     anchor=$(echo $TAG | sed -e 's/^v//' -e 's/[^a-zA-Z0-9]/-/g')
-    $BIN_DIR/tea release create $assets --repo $REPO --note "$RELEASENOTES" --tag $TAG --title $TAG --draft ${releasetype}
+    if ! $BIN_DIR/tea release create $assets --repo $REPO --note "$RELEASENOTES" --tag $TAG --title $TAG --draft ${releasetype} >& $TMP_DIR/tea.log ; then
+	if grep --quiet 'Unknown API Error: 500' $TMP_DIR/tea.log && grep --quiet services/release/release.go:194 $TMP_DIR/tea.log ; then
+	    echo "workaround v1.20 race condition https://codeberg.org/forgejo/forgejo/issues/1370"
+	    sleep 10
+	    $BIN_DIR/tea release create $assets --repo $REPO --note "$RELEASENOTES" --tag $TAG --title $TAG --draft ${releasetype}
+	else
+	    cat $TMP_DIR/tea.log
+	    return 1
+	fi
+    fi
     release_draft false
 }
 
