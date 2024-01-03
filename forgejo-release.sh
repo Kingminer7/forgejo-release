@@ -40,7 +40,7 @@ ensure_tag() {
 upload_release() {
     local assets=$(ls $RELEASE_DIR/* | sed -e 's/^/-a /')
     local releasetype
-    echo "${TAG}" | grep -qi '\-rc' && export releasetype="--prerelease" && echo "Uploading as Pre-Release"
+    ( $PRERELEASE || echo "${TAG}" | grep -qi '\-rc' ) && export releasetype="--prerelease" && echo "Uploading as Pre-Release"
     test ${releasetype+false} || echo "Uploading as Stable"
     ensure_tag
     anchor=$(echo $TAG | sed -e 's/^v//' -e 's/[^a-zA-Z0-9]/-/g')
