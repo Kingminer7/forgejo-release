@@ -40,3 +40,7 @@ jobs:
           release-dir: dist/release
           release-notes: "MY RELEASE NOTES"
 ```
+
+## Update the README
+
+With https://github.com/npalm/action-docs `action-docs --update-readme`
