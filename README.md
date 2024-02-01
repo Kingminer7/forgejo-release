@@ -27,7 +27,9 @@ Upload or download the assets of a release to a Forgejo instance.
 
 ## Example
 
-```
+### Upload
+
+```yaml
 on: [tag]
 jobs:
   upload-release:
@@ -36,10 +38,30 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/forgejo-release@v1
         with:
-	  direction: upload
-	  url: https://code.forgejo.org
+	        direction: upload
+	        url: https://code.forgejo.org
           release-dir: dist/release
           release-notes: "MY RELEASE NOTES"
+```
+
+### Download
+
+Example downloading the forgejo release v1.21.4-0 into the working directory:
+
+```yaml
+on: [tag]
+jobs:
+  download-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/forgejo-release@v1
+        with:
+	        direction: download
+	        url: https://code.forgejo.org
+          repo: forgejo/forgejo
+          tag: v1.21.4-0
+          release-dir: ./  # by default, files are downloaded into dist/release
 ```
 
 ## Update the README
