@@ -12,6 +12,7 @@ if ${VERBOSE:-false}; then set -x; fi
 : ${GNUPGHOME:=$TMP_DIR}
 : ${BIN_DIR:=$TMP_DIR}
 : ${TEA_VERSION:=0.9.0}
+: ${OVERRIDE:=false}
 : ${RETRY:=1}
 : ${DELAY:=10}
 
@@ -84,12 +85,21 @@ maybe_sign_release() {
     fi
 }
 
+maybe_override() {
+    if test "$OVERRIDE" = "false"; then
+	return
+    fi
+    api DELETE repos/$REPO/releases/tags/$TAG >& /dev/null || true
+    api DELETE repos/$REPO/tags/$TAG >& /dev/null || true
+}
+
 upload() {
     setup_api
     setup_tea
     rm -f ~/.config/tea/config.yml
     GITEA_SERVER_TOKEN=$TOKEN $BIN_DIR/tea login add --url $FORGEJO
     maybe_sign_release
+    maybe_override
     upload_release
 }
 

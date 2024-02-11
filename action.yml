@@ -32,6 +32,9 @@ inputs:
   verbose:
     description: 'Increase the verbosity level'
     default: 'false'
+  override:
+    description: 'Override an existing release by the same {tag}'
+    default: 'false'
   prerelease:
     description: 'Mark Release as Pre-Release'
     default: 'false'
@@ -75,6 +78,8 @@ runs:
         if test -z "$SHA"; then
           export SHA="${{ github.sha }}"
         fi
+
+        export OVERRIDE="${{ inputs.override }}"
 
         export VERBOSE="${{ inputs.verbose }}"
 
