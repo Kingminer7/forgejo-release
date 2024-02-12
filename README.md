@@ -22,6 +22,7 @@ Upload or download the assets of a release to a Forgejo instance.
 | gpg-passphrase | Passphrase of the GPG Private Key | `false` |  |
 | download-retry | Number of times to retry if the release is not ready (default 1) | `false` |  |
 | verbose | Increase the verbosity level | `false` | false |
+| override | Override an existing release by the same {tag} | `false` | false |
 | prerelease | Mark Release as Pre-Release | `false` | false |
 <!-- action-docs-inputs -->
 
