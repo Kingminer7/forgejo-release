@@ -20,7 +20,8 @@ export GNUPGHOME
 
 setup_tea() {
     if ! test -f $BIN_DIR/tea ; then
-	curl -sL https://dl.gitea.io/tea/$TEA_VERSION/tea-$TEA_VERSION-linux-amd64 > $BIN_DIR/tea
+	ARCH=$(dpkg --print-architecture)
+	curl -sL https://dl.gitea.io/tea/$TEA_VERSION/tea-$TEA_VERSION-linux-$ARCH > $BIN_DIR/tea
 	chmod +x $BIN_DIR/tea
     fi
 }
