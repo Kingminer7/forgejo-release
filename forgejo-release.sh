@@ -107,7 +107,7 @@ upload() {
 setup_api() {
     if ! which jq curl ; then
 	apt-get -qq update
-	apt-get install -y -qq jq curl wget
+	apt-get install -y -qq jq curl
     fi
 }
 
@@ -149,7 +149,7 @@ download() {
 	cd $RELEASE_DIR
 	api GET repos/$REPO/releases/tags/$TAG > $TMP_DIR/assets.json
 	jq --raw-output '.assets[] | "\(.name) \(.browser_download_url)"' < $TMP_DIR/assets.json | while read name url ; do
-	    wget --quiet -O $name $url
+	    curl --fail -H "Authorization: token $TOKEN" -o $name -L $url
 	done
     )
 }
