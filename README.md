@@ -1,30 +1,31 @@
 # forgejo-release
 
-<!-- action-docs-description -->
+<!-- action-docs-description source="action.yml" -->
 ## Description
 
 Upload or download the assets of a release to a Forgejo instance.
-<!-- action-docs-description -->
-<!-- action-docs-inputs -->
+<!-- action-docs-description source="action.yml" -->
+<!-- action-docs-inputs source="action.yml" -->
 ## Inputs
 
-| parameter | description | required | default |
+| name | description | required | default |
 | --- | --- | --- | --- |
-| url | URL of the Forgejo instance | `false` |  |
-| repo | owner/project relative to the URL | `false` |  |
-| tag | Tag of the release | `false` |  |
-| sha | SHA of the release | `false` |  |
-| token | Forgejo application token | `true` |  |
-| release-dir | Directory in whichs release assets are uploaded or downloaded | `true` |  |
-| release-notes | Release notes | `false` |  |
-| direction | Can either be download or upload | `true` |  |
-| gpg-private-key | GPG Private Key to sign the release artifacts | `false` |  |
-| gpg-passphrase | Passphrase of the GPG Private Key | `false` |  |
-| download-retry | Number of times to retry if the release is not ready (default 1) | `false` |  |
-| verbose | Increase the verbosity level | `false` | false |
-| override | Override an existing release by the same {tag} | `false` | false |
-| prerelease | Mark Release as Pre-Release | `false` | false |
-<!-- action-docs-inputs -->
+| `url` | <p>URL of the Forgejo instance</p> | `false` | `""` |
+| `repo` | <p>owner/project relative to the URL</p> | `false` | `""` |
+| `tag` | <p>Tag of the release</p> | `false` | `""` |
+| `sha` | <p>SHA of the release</p> | `false` | `""` |
+| `token` | <p>Forgejo application token</p> | `true` | `""` |
+| `release-dir` | <p>Directory in whichs release assets are uploaded or downloaded</p> | `true` | `""` |
+| `release-notes` | <p>Release notes</p> | `false` | `""` |
+| `direction` | <p>Can either be download or upload</p> | `true` | `""` |
+| `gpg-private-key` | <p>GPG Private Key to sign the release artifacts</p> | `false` | `""` |
+| `gpg-passphrase` | <p>Passphrase of the GPG Private Key</p> | `false` | `""` |
+| `download-retry` | <p>Number of times to retry if the release is not ready (default 1)</p> | `false` | `""` |
+| `download-latest` | <p>Download the latest release</p> | `false` | `false` |
+| `verbose` | <p>Increase the verbosity level</p> | `false` | `false` |
+| `override` | <p>Override an existing release by the same {tag}</p> | `false` | `false` |
+| `prerelease` | <p>Mark Release as Pre-Release</p> | `false` | `false` |
+<!-- action-docs-inputs source="action.yml" -->
 
 ## Example
 

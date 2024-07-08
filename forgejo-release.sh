@@ -8,6 +8,7 @@ if ${VERBOSE:-false}; then set -x; fi
 : ${FORGEJO:=https://codeberg.org}
 : ${REPO:=forgejo-integration/forgejo}
 : ${RELEASE_DIR:=dist/release}
+: ${DOWNLOAD_LATEST:=false}
 : ${TMP_DIR:=$(mktemp -d)}
 : ${GNUPGHOME:=$TMP_DIR}
 : ${BIN_DIR:=$TMP_DIR}
@@ -143,17 +144,22 @@ wait_release() {
 
 download() {
     setup_api
-    wait_release
     (
 	mkdir -p $RELEASE_DIR
 	cd $RELEASE_DIR
-	api GET repos/$REPO/releases/tags/$TAG > $TMP_DIR/assets.json
+    if [[ ${DOWNLOAD_LATEST} == "true" ]] ; then
+        echo "Downloading the latest release"
+        api GET repos/$REPO/releases/latest > $TMP_DIR/assets.json
+    elif [[ ${DOWNLOAD_LATEST} == "false" ]] ; then
+        wait_release
+        echo "Downloading tagged release ${TAG}"
+	    api GET repos/$REPO/releases/tags/$TAG > $TMP_DIR/assets.json
+    fi
 	jq --raw-output '.assets[] | "\(.name) \(.browser_download_url)"' < $TMP_DIR/assets.json | while read name url ; do
 	    curl --fail -H "Authorization: token $TOKEN" -o $name -L $url
 	done
     )
 }
-
 
 missing() {
     echo need upload or download argument got nothing

@@ -35,6 +35,31 @@ jobs:
           release-dir: upload-dir
           release-notes: "RELEASE NOTES"
           verbose: true
+      - id: release-upload-override
+        uses: SELF@vTest
+        with:
+          direction: upload
+          url: ${{ steps.forgejo.outputs.url }}
+          repo: testuser/testrepo
+          tag: v1.0
+          sha: ${{ steps.testrepo.outputs.sha }}
+          token: ${{ steps.forgejo.outputs.token }}
+          release-dir: upload-dir
+          release-notes: "RELEASE NOTES"
+          override: true
+          verbose: true
+      - id: release-upload-v2
+        uses: SELF@vTest
+        with:
+          direction: upload
+          url: ${{ steps.forgejo.outputs.url }}
+          repo: testuser/testrepo
+          tag: v2.0
+          sha: ${{ steps.testrepo.outputs.sha }}
+          token: ${{ steps.forgejo.outputs.token }}
+          release-dir: upload-dir-v2
+          release-notes: "RELEASE NOTES V2"
+          verbose: true
       - id: release-download
         uses: SELF@vTest
         with:
@@ -47,5 +72,17 @@ jobs:
           verbose: true
       - run: |
           diff -u upload-dir download-dir
+      - id: release-download-latest
+        uses: SELF@vTest
+        with:
+          direction: download
+          url: ${{ steps.forgejo.outputs.url }}
+          repo: testuser/testrepo
+          token: ${{ steps.forgejo.outputs.token }}
+          release-dir: download-dir-v2
+          download-latest: true
+          verbose: true
+      - run: |
+          diff -u upload-dir-v2 download-dir-v2
       - if: failure()
         run: docker logs forgejo

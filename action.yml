@@ -29,6 +29,9 @@ inputs:
     description: 'Passphrase of the GPG Private Key'
   download-retry:
     description: 'Number of times to retry if the release is not ready (default 1)'
+  download-latest:
+    description: 'Download the latest release'
+    default: 'false'
   verbose:
     description: 'Increase the verbosity level'
     default: 'false'
@@ -65,6 +68,8 @@ runs:
           # trim refs/tags/
           TAG=${TAG##refs/tags/}
         fi
+
+        export DOWNLOAD_LATEST="${{ inputs.download-latest }}"
 
         export PRERELEASE="${{ inputs.prerelease }}"
 
