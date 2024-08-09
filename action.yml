@@ -10,6 +10,8 @@ inputs:
     description: 'owner/project relative to the URL'
   tag:
     description: 'Tag of the release'
+  title:
+    description: 'Title of the release (defaults to tag)'
   sha:
     description: 'SHA of the release'
   token:
@@ -68,6 +70,8 @@ runs:
           # trim refs/tags/
           TAG=${TAG##refs/tags/}
         fi
+
+        export TITLE="${{ inputs.title }}"
 
         export DOWNLOAD_LATEST="${{ inputs.download-latest }}"
 

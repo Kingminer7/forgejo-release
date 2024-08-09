@@ -7,6 +7,7 @@ if ${VERBOSE:-false}; then set -x; fi
 
 : ${FORGEJO:=https://codeberg.org}
 : ${REPO:=forgejo-integration/forgejo}
+: ${TITLE:=$TAG}
 : ${RELEASE_DIR:=dist/release}
 : ${DOWNLOAD_LATEST:=false}
 : ${TMP_DIR:=$(mktemp -d)}
@@ -47,11 +48,11 @@ upload_release() {
     test ${releasetype+false} || echo "Uploading as Stable"
     ensure_tag
     anchor=$(echo $TAG | sed -e 's/^v//' -e 's/[^a-zA-Z0-9]/-/g')
-    if ! $BIN_DIR/tea release create $assets --repo $REPO --note "$RELEASENOTES" --tag $TAG --title $TAG --draft ${releasetype} >& $TMP_DIR/tea.log ; then
+    if ! $BIN_DIR/tea release create $assets --repo $REPO --note "$RELEASENOTES" --tag $TAG --title "$TITLE" --draft ${releasetype} >& $TMP_DIR/tea.log ; then
 	if grep --quiet 'Unknown API Error: 500' $TMP_DIR/tea.log && grep --quiet services/release/release.go:194 $TMP_DIR/tea.log ; then
 	    echo "workaround v1.20 race condition https://codeberg.org/forgejo/forgejo/issues/1370"
 	    sleep 10
-	    $BIN_DIR/tea release create $assets --repo $REPO --note "$RELEASENOTES" --tag $TAG --title $TAG --draft ${releasetype}
+	    $BIN_DIR/tea release create $assets --repo $REPO --note "$RELEASENOTES" --tag $TAG --title "$TITLE" --draft ${releasetype}
 	else
 	    cat $TMP_DIR/tea.log
 	    return 1
