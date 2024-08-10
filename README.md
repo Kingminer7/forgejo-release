@@ -13,6 +13,7 @@ Upload or download the assets of a release to a Forgejo instance.
 | `url` | <p>URL of the Forgejo instance</p> | `false` | `""` |
 | `repo` | <p>owner/project relative to the URL</p> | `false` | `""` |
 | `tag` | <p>Tag of the release</p> | `false` | `""` |
+| `title` | <p>Title of the release</p> | `false` | `""` |
 | `sha` | <p>SHA of the release</p> | `false` | `""` |
 | `token` | <p>Forgejo application token</p> | `true` | `""` |
 | `release-dir` | <p>Directory in whichs release assets are uploaded or downloaded</p> | `true` | `""` |
@@ -40,8 +41,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/forgejo-release@v1
         with:
-	        direction: upload
-	        url: https://code.forgejo.org
+          direction: upload
+          url: https://code.forgejo.org
           release-dir: dist/release
           release-notes: "MY RELEASE NOTES"
 ```
@@ -59,8 +60,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/forgejo-release@v1
         with:
-	        direction: download
-	        url: https://code.forgejo.org
+          direction: download
+          url: https://code.forgejo.org
           repo: forgejo/forgejo
           tag: v1.21.4-0
           release-dir: ./  # by default, files are downloaded into dist/release
