@@ -81,7 +81,10 @@ runs:
 
         export RELEASE_DIR="${{ inputs.release-dir }}"
 
-        export RELEASENOTES="${{ inputs.release-notes }}"
+        export RELEASENOTES=$(cat << 'EOF'
+        ${{ inputs.release-notes }}
+        EOF
+        )
 
         export SHA="${{ inputs.sha }}"
         if test -z "$SHA"; then

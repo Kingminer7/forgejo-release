@@ -21,6 +21,17 @@ jobs:
           export FORGEJO_RUNNER_LOGS="${{ steps.forgejo.outputs.runner-logs }}"
           forgejo-test-helper.sh run_workflow testdata/upload-download http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }} testuser upload-download forgejo-release "${{ steps.forgejo.outputs.token }}"
 
+          set -ex
+          export FORGEJO="${{ steps.forgejo.outputs.url }}"
+          curl --fail -sS $FORGEJO/api/v1/repos/testuser/upload-download/releases/tags/v2.0 > /tmp/release.json
+          EXPECTED='No shell expansion should on these notes:
+          - $(some_command)
+          - `other_commend`
+          - "double quoted" and '\''single quoted'\'' strings
+          - \backslash escape
+          - !exclamation_mark'
+          test "$EXPECTED" = "$(jq -r .body < /tmp/release.json)"
+
       - name: testdata/upload-download-private
         run: |
           export FORGEJO_RUNNER_LOGS="${{ steps.forgejo.outputs.runner-logs }}"

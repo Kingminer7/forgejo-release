@@ -36,7 +36,13 @@ jobs:
           tag: v2.0
           token: FORGEJO_TOKEN
           release-dir: upload-dir-v2
-          release-notes: "RELEASE NOTES V2"
+          release-notes: |-
+            No shell expansion should on these notes:
+            - $(some_command)
+            - `other_commend`
+            - "double quoted" and 'single quoted' strings
+            - \backslash escape
+            - !exclamation_mark
           verbose: true
       - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         id: release-download
