@@ -13,18 +13,18 @@ Upload or download the assets of a release to a Forgejo instance.
 | `url` | <p>URL of the Forgejo instance</p> | `false` | `""` |
 | `repo` | <p>owner/project relative to the URL</p> | `false` | `""` |
 | `tag` | <p>Tag of the release</p> | `false` | `""` |
-| `title` | <p>Title of the release</p> | `false` | `""` |
+| `title` | <p>Title of the release (defaults to tag)</p> | `false` | `""` |
 | `sha` | <p>SHA of the release</p> | `false` | `""` |
 | `token` | <p>Forgejo application token</p> | `true` | `""` |
 | `release-dir` | <p>Directory in whichs release assets are uploaded or downloaded</p> | `true` | `""` |
 | `release-notes` | <p>Release notes</p> | `false` | `""` |
-| `direction` | <p>Can either be download or upload</p> | `true` | `""` |
+| `direction` | <p>Can either be <code>download</code> or <code>upload</code></p> | `true` | `""` |
 | `gpg-private-key` | <p>GPG Private Key to sign the release artifacts</p> | `false` | `""` |
 | `gpg-passphrase` | <p>Passphrase of the GPG Private Key</p> | `false` | `""` |
 | `download-retry` | <p>Number of times to retry if the release is not ready (default 1)</p> | `false` | `""` |
 | `download-latest` | <p>Download the latest release</p> | `false` | `false` |
 | `verbose` | <p>Increase the verbosity level</p> | `false` | `false` |
-| `override` | <p>Override an existing release by the same {tag}</p> | `false` | `false` |
+| `override` | <p>Override an existing release by the same <code>{tag}</code></p> | `false` | `false` |
 | `prerelease` | <p>Mark Release as Pre-Release</p> | `false` | `false` |
 <!-- action-docs-inputs source="action.yml" -->
 
