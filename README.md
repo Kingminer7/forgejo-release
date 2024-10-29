@@ -28,9 +28,11 @@ Upload or download the assets of a release to a Forgejo instance.
 | `prerelease` | <p>Mark Release as Pre-Release</p> | `false` | `false` |
 <!-- action-docs-inputs source="action.yml" -->
 
-## Example
+## Examples
 
 ### Upload
+
+Upload the release located in `release-dir` to the release section of a repository (`url` and `repo`):
 
 ```yaml
 on: [tag]
@@ -39,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/forgejo-release@v1
+      - uses: actions/forgejo-release@v2
         with:
           direction: upload
           url: https://code.forgejo.org
@@ -58,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/forgejo-release@v1
+      - uses: actions/forgejo-release@v2
         with:
           direction: download
           url: https://code.forgejo.org
@@ -67,6 +69,15 @@ jobs:
           release-dir: ./  # by default, files are downloaded into dist/release
 ```
 
-## Update the README
+### Real world example
 
-With https://github.com/npalm/action-docs `action-docs --update-readme`
+This action is used to [publish](https://code.forgejo.org/forgejo/release-notes-assistant/src/branch/main/.forgejo/workflows/release.yml) the release notes assistant assets.
+
+## Update the `input` section of the README
+
+Using [action-docs](https://github.com/npalm/action-docs):
+
+```shell
+# Edit the action.yml file and run:
+action-docs --update-readme
+```
