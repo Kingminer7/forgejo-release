@@ -26,6 +26,7 @@ Upload or download the assets of a release to a Forgejo instance.
 | `verbose` | <p>Increase the verbosity level</p> | `false` | `false` |
 | `override` | <p>Override an existing release by the same <code>{tag}</code></p> | `false` | `false` |
 | `prerelease` | <p>Mark Release as Pre-Release</p> | `false` | `false` |
+| `release-notes-assistant` | <p>Generate release notes with Release Notes Assistant</p> | `false` | `false` |
 <!-- action-docs-inputs source="action.yml" -->
 
 ## Examples

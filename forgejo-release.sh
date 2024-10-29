@@ -52,15 +52,16 @@ upload_release() {
     ensure_tag
     anchor=$(echo $TAG | sed -e 's/^v//' -e 's/[^a-zA-Z0-9]/-/g')
     if ! $BIN_DIR/tea release create $assets --repo $REPO --note "$RELEASENOTES" --tag $TAG --title "$TITLE" --draft ${releasetype} >& $TMP_DIR/tea.log ; then
-	if grep --quiet 'Unknown API Error: 500' $TMP_DIR/tea.log && grep --quiet services/release/release.go:194 $TMP_DIR/tea.log ; then
-	    echo "workaround v1.20 race condition https://codeberg.org/forgejo/forgejo/issues/1370"
-	    sleep 10
-	    $BIN_DIR/tea release create $assets --repo $REPO --note "$RELEASENOTES" --tag $TAG --title "$TITLE" --draft ${releasetype}
-	else
-	    cat $TMP_DIR/tea.log
-	    return 1
-	fi
+        if grep --quiet 'Unknown API Error: 500' $TMP_DIR/tea.log && grep --quiet services/release/release.go:194 $TMP_DIR/tea.log ; then
+            echo "workaround v1.20 race condition https://codeberg.org/forgejo/forgejo/issues/1370"
+            sleep 10
+            $BIN_DIR/tea release create $assets --repo $REPO --note "$RELEASENOTES" --tag $TAG --title "$TITLE" --draft ${releasetype}
+        else
+            cat $TMP_DIR/tea.log
+            return 1
+        fi
     fi
+    maybe_use_release_note_assistant
     release_draft false
 }
 
@@ -69,6 +70,14 @@ release_draft() {
 
     local id=$(api GET repos/$REPO/releases/tags/$TAG | jq --raw-output .id)
     api PATCH repos/$REPO/releases/$id --data-raw '{"draft": '$state'}'
+}
+
+maybe_use_release_note_assistant() {
+    if "$RELEASE_NOTES_ASSISTANT"; then
+        curl --fail -s -S -o rna https://code.forgejo.org/forgejo/release-notes-assistant/releases/download/v1.2.3/release-notes-assistant
+        chmod +x ./rna
+        ./rna --storage release --storage-location $TAG --forgejo-url $SCHEME://placeholder:$TOKEN@$HOST --repository $REPO --token $TOKEN release $TAG
+    fi
 }
 
 sign_release() {
