@@ -23,7 +23,7 @@ inputs:
   release-notes:
     description: 'Release notes'
   direction:
-    description: 'Can either be download or upload'
+    description: 'Can either be `download` or `upload`'
     required: true
   gpg-private-key:
     description: 'GPG Private Key to sign the release artifacts'
@@ -38,7 +38,7 @@ inputs:
     description: 'Increase the verbosity level'
     default: 'false'
   override:
-    description: 'Override an existing release by the same {tag}'
+    description: 'Override an existing release by the same `{tag}`'
     default: 'false'
   prerelease:
     description: 'Mark Release as Pre-Release'
