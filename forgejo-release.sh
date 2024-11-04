@@ -43,9 +43,12 @@ ensure_tag() {
 
 upload_release() {
     local assets=$(ls $RELEASE_DIR/* | sed -e 's/^/-a /')
-    local releasetype
-    ( $PRERELEASE || echo "${TAG}" | grep -qi '\-rc' ) && export releasetype="--prerelease" && echo "Uploading as Pre-Release"
-    test ${releasetype+false} || echo "Uploading as Stable"
+    if $PRERELEASE || echo "${TAG}" | grep -qi '\-rc' ; then
+        releasetype="--prerelease"
+        echo "Uploading as Pre-Release"
+    else
+        echo "Uploading as Stable"
+    fi
     ensure_tag
     anchor=$(echo $TAG | sed -e 's/^v//' -e 's/[^a-zA-Z0-9]/-/g')
     if ! $BIN_DIR/tea release create $assets --repo $REPO --note "$RELEASENOTES" --tag $TAG --title "$TITLE" --draft ${releasetype} >& $TMP_DIR/tea.log ; then
