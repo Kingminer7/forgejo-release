@@ -32,6 +32,9 @@ jobs:
           - !exclamation_mark'
           test "$EXPECTED" = "$(jq -r .body < /tmp/release.json)"
 
+          curl --fail -sS $FORGEJO/api/v1/repos/testuser/upload-download/releases/tags/v1.0 > /tmp/v1.json
+          cat /tmp/v1.json | jq -r .body | grep '<!--start release-notes-assistant-->'
+
       - name: testdata/upload-download-private
         run: |
           export FORGEJO_RUNNER_LOGS="${{ steps.forgejo.outputs.runner-logs }}"
