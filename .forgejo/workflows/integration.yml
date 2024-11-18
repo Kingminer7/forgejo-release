@@ -18,7 +18,7 @@ jobs:
 
       - name: testdata/upload-download
         run: |
-          LOOP_DELAY=30
+          export LOOP_DELAY=30
           export FORGEJO_RUNNER_LOGS="${{ steps.forgejo.outputs.runner-logs }}"
           forgejo-test-helper.sh run_workflow testdata/upload-download http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }} testuser upload-download forgejo-release "${{ steps.forgejo.outputs.token }}"
 
@@ -35,14 +35,14 @@ jobs:
 
       - name: testdata/upload-download-private
         run: |
-          LOOP_DELAY=30
+          export LOOP_DELAY=30
           export FORGEJO_RUNNER_LOGS="${{ steps.forgejo.outputs.runner-logs }}"
           curl -X 'POST' 'http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }}/api/v1/user/repos' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"name": "upload-download-private","private": true}'
           forgejo-test-helper.sh run_workflow testdata/upload-download http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }} testuser upload-download-private forgejo-release "${{ steps.forgejo.outputs.token }}"
 
       - name: testdata/nested-upload-download
         run: |
-          LOOP_DELAY=30
+          export LOOP_DELAY=30
           export FORGEJO_RUNNER_LOGS="${{ steps.forgejo.outputs.runner-logs }}"
           forgejo-test-helper.sh run_workflow testdata/nested-upload-download http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }} testuser nested-upload-download forgejo-release "${{ steps.forgejo.outputs.token }}"
 
