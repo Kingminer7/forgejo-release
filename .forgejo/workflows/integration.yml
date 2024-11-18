@@ -6,11 +6,11 @@ jobs:
       - uses: actions/checkout@v3
 
       - id: forgejo
-        uses: https://code.forgejo.org/actions/setup-forgejo@v1
+        uses: https://code.forgejo.org/actions/setup-forgejo@v2.0.2
         with:
           user: testuser
           password: admin1234
-          image-version: 1.20
+          image-version: 9
 
       - name: push self
         run: |
@@ -32,6 +32,9 @@ jobs:
           - \backslash escape
           - !exclamation_mark'
           test "$EXPECTED" = "$(jq -r .body < /tmp/release.json)"
+
+          curl --fail -sS $FORGEJO/api/v1/repos/testuser/upload-download/releases/tags/v1.0 > /tmp/v1.json
+          cat /tmp/v1.json | jq -r .body | grep '<!--start release-notes-assistant-->'
 
       - name: testdata/upload-download-private
         run: |
