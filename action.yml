@@ -33,19 +33,22 @@ inputs:
     description: 'Number of times to retry if the release is not ready (default 1)'
   download-latest:
     description: 'Download the latest release'
-    default: 'false'
+    default: false
   verbose:
     description: 'Increase the verbosity level'
-    default: 'false'
+    default: false
   override:
     description: 'Override an existing release by the same `{tag}`'
-    default: 'false'
+    default: false
   prerelease:
     description: 'Mark Release as Pre-Release'
-    default: 'false'
+    default: false
   release-notes-assistant:
     description: 'Generate release notes with Release Notes Assistant'
-    default: 'false'
+    default: false
+  hide-archive-link:
+    description: 'Hide the archive links'
+    default: false
 
 runs:
   using: "composite"
@@ -83,6 +86,8 @@ runs:
         export PRERELEASE="${{ inputs.prerelease }}"
 
         export RELEASE_NOTES_ASSISTANT="${{ inputs.release-notes-assistant }}"
+
+        export HIDE_ARCHIVE_LINK="${{ inputs.hide-archive-link }}"
 
         export TOKEN="${{ inputs.token }}"
 

@@ -15,6 +15,7 @@ if ${VERBOSE:-false}; then set -x; fi
 : ${BIN_DIR:=$TMP_DIR}
 : ${TEA_VERSION:=0.9.0}
 : ${OVERRIDE:=false}
+: ${HIDE_ARCHIVE_LINK:=false}
 : ${RETRY:=1}
 : ${DELAY:=10}
 
@@ -69,7 +70,8 @@ release_draft() {
     local state="$1"
 
     local id=$(api GET repos/$REPO/releases/tags/$TAG | jq --raw-output .id)
-    api PATCH repos/$REPO/releases/$id --data-raw '{"draft": '$state'}'
+
+    api PATCH repos/$REPO/releases/$id --data-raw '{"draft": '$state', "hide_archive_links": '$HIDE_ARCHIVE_LINK'}'
 }
 
 maybe_use_release_note_assistant() {
