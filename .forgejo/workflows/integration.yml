@@ -24,17 +24,21 @@ jobs:
 
           set -ex
           export FORGEJO="${{ steps.forgejo.outputs.url }}"
-          curl --fail -sS $FORGEJO/api/v1/repos/testuser/upload-download/releases/tags/v2.0 > /tmp/release.json
+          curl --fail -sS $FORGEJO/api/v1/repos/testuser/upload-download/releases/tags/v2.0 > /tmp/v2.json
           EXPECTED='No shell expansion should on these notes:
           - $(some_command)
           - `other_commend`
           - "double quoted" and '\''single quoted'\'' strings
           - \backslash escape
           - !exclamation_mark'
-          test "$EXPECTED" = "$(jq -r .body < /tmp/release.json)"
+          test "$EXPECTED" = "$(jq -r .body < /tmp/v2.json)"
+
+          test $(cat /tmp/v2.json | jq -r .hide_archive_links) = false
 
           curl --fail -sS $FORGEJO/api/v1/repos/testuser/upload-download/releases/tags/v1.0 > /tmp/v1.json
           cat /tmp/v1.json | jq -r .body | grep '<!--start release-notes-assistant-->'
+
+          test $(cat /tmp/v1.json | jq -r .hide_archive_links) = true
 
       - name: testdata/upload-download-private
         run: |

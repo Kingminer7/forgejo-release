@@ -26,6 +26,7 @@ jobs:
           token: FORGEJO_TOKEN
           release-dir: upload-dir
           release-notes-assistant: true
+          hide-archive-link: true
           override: true
           verbose: true
       - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
