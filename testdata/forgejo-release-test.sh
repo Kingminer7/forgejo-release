@@ -45,15 +45,18 @@ test_ensure_tag() {
     # idempotent
     #
     ensure_tag
-    api GET repos/$REPO/tags/$TAG >$TMP_DIR/tag1.json
+    mv $TAG_FILE $TMP_DIR/tag1.json
+
     ensure_tag
-    api GET repos/$REPO/tags/$TAG >$TMP_DIR/tag2.json
+    mv $TAG_FILE $TMP_DIR/tag2.json
+
     diff -u $TMP_DIR/tag[12].json
     #
     # sanity check on the SHA of an existing tag
     #
     (
         SHA=12345
+        ! matched_tag
         ! ensure_tag
     )
     api DELETE repos/$REPO/tags/$TAG

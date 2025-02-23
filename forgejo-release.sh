@@ -19,6 +19,8 @@ if ${VERBOSE:-false}; then set -x; fi
 : ${RETRY:=1}
 : ${DELAY:=10}
 
+TAG_FILE="$TMP_DIR/tag$$.json"
+
 export GNUPGHOME
 
 setup_tea() {
@@ -29,16 +31,35 @@ setup_tea() {
     fi
 }
 
+get_tag() {
+    if ! test -f "$TAG_FILE"; then
+        if api GET repos/$REPO/tags/"$TAG" >"$TAG_FILE"; then
+            echo "tag $TAG exists"
+        else
+            echo "tag $TAG does not exists"
+        fi
+    fi
+    test -s "$TAG_FILE"
+}
+
+matched_tag() {
+    if get_tag; then
+        local sha=$(jq --raw-output .commit.sha <"$TAG_FILE")
+        test "$sha" = "$SHA"
+    else
+        return 1
+    fi
+}
+
 ensure_tag() {
-    if api GET repos/$REPO/tags/"$TAG" >"$TMP_DIR"/tag.json; then
-        local sha=$(jq --raw-output .commit.sha <"$TMP_DIR"/tag.json)
-        if test "$sha" != "$SHA"; then
-            cat "$TMP_DIR"/tag.json
+    if get_tag; then
+        if ! matched_tag; then
+            cat "$TAG_FILE"
             echo "the tag SHA in the $REPO repository does not match the tag SHA that triggered the build: $SHA"
-            false
+            return 1
         fi
     else
-        api POST repos/$REPO/tags --data-raw '{"tag_name": "'"$TAG"'", "target": "'"$SHA"'"}'
+        api POST repos/$REPO/tags --data-raw '{"tag_name": "'"$TAG"'", "target": "'"$SHA"'"}' >"$TAG_FILE"
     fi
 }
 
@@ -112,7 +133,9 @@ maybe_override() {
         return
     fi
     api DELETE repos/$REPO/releases/tags/"$TAG" >&/dev/null || true
-    api DELETE repos/$REPO/tags/"$TAG" >&/dev/null || true
+    if get_tag && ! matched_tag; then
+        api DELETE repos/$REPO/tags/"$TAG"
+    fi
 }
 
 upload() {
