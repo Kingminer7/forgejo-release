@@ -59,7 +59,18 @@ ensure_tag() {
             return 1
         fi
     else
-        api POST repos/$REPO/tags --data-raw '{"tag_name": "'"$TAG"'", "target": "'"$SHA"'"}' >"$TAG_FILE"
+        create_tag
+    fi
+}
+
+create_tag() {
+    api POST repos/$REPO/tags --data-raw '{"tag_name": "'"$TAG"'", "target": "'"$SHA"'"}' >"$TAG_FILE"
+}
+
+delete_tag() {
+    if get_tag; then
+        api DELETE repos/$REPO/tags/$TAG
+        rm -f "$TAG_FILE"
     fi
 }
 
@@ -134,7 +145,7 @@ maybe_override() {
     fi
     api DELETE repos/$REPO/releases/tags/"$TAG" >&/dev/null || true
     if get_tag && ! matched_tag; then
-        api DELETE repos/$REPO/tags/"$TAG"
+        delete_tag
     fi
 }
 
