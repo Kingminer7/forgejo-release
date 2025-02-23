@@ -39,8 +39,18 @@ test_wait_release() {
     ! wait_release
 }
 
+test_create_delete_tag() {
+    delete_tag
+
+    ! get_tag
+    create_tag
+    get_tag
+    delete_tag
+    ! get_tag
+}
+
 test_ensure_tag() {
-    api DELETE repos/$REPO/tags/$TAG || true
+    delete_tag
     #
     # idempotent
     #
@@ -59,7 +69,7 @@ test_ensure_tag() {
         ! matched_tag
         ! ensure_tag
     )
-    api DELETE repos/$REPO/tags/$TAG
+    delete_tag
 }
 
 test_maybe_sign_release_no_gpg() {
@@ -133,6 +143,7 @@ test_run() {
     REPO=$user/$project
     test_setup $project
     test_ensure_tag
+    test_create_delete_tag
     DELAY=0
     test_wait_release_fail
     echo "================================ TEST BEGIN"
