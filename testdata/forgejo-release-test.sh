@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 set -ex
+PS4='${BASH_SOURCE[0]}:$LINENO: ${FUNCNAME[0]}:  '
 
 test_teardown() {
     setup_api
@@ -44,16 +45,16 @@ test_ensure_tag() {
     # idempotent
     #
     ensure_tag
-    api GET repos/$REPO/tags/$TAG > $TMP_DIR/tag1.json
+    api GET repos/$REPO/tags/$TAG >$TMP_DIR/tag1.json
     ensure_tag
-    api GET repos/$REPO/tags/$TAG > $TMP_DIR/tag2.json
+    api GET repos/$REPO/tags/$TAG >$TMP_DIR/tag2.json
     diff -u $TMP_DIR/tag[12].json
     #
     # sanity check on the SHA of an existing tag
     #
     (
-	SHA=12345
-	! ensure_tag
+        SHA=12345
+        ! ensure_tag
     )
     api DELETE repos/$REPO/tags/$TAG
 }
@@ -94,8 +95,8 @@ test_maybe_sign_release_skipped() {
 }
 
 test_maybe_sign_release_verify() {
-    for file in  $RELEASE_DIR/file-one.txt  $RELEASE_DIR/file-two.txt; do
-	gpg --verify $file.asc $file
+    for file in $RELEASE_DIR/file-one.txt $RELEASE_DIR/file-two.txt; do
+        gpg --verify $file.asc $file
     done
 }
 
