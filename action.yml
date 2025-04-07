@@ -6,17 +6,21 @@ description: |
 inputs:
   url:
     description: 'URL of the Forgejo instance'
+    default: '${{ env.GITHUB_SERVER_URL }}'
   repo:
     description: 'owner/project relative to the URL'
+    default: '${{ github.repository }}'
   tag:
     description: 'Tag of the release'
+    default: '${{ github.ref_name }}'
   title:
     description: 'Title of the release (defaults to tag)'
   sha:
     description: 'SHA of the release'
+    default: '${{ github.sha }}'
   token:
     description: 'Forgejo application token'
-    required: true
+    default: '${{ secrets.GITHUB_TOKEN }}'
   release-dir:
     description: 'Directory in whichs release assets are uploaded or downloaded'
     required: true
@@ -57,9 +61,6 @@ runs:
       shell: bash
     - run: |
         export FORGEJO="${{ inputs.url }}"
-        if test -z "$FORGEJO"; then
-          export FORGEJO="${{ env.GITHUB_SERVER_URL }}"
-        fi
         # A trailing / will mean http://forgejo//api/v1 is used
         # and it always 401 as of v1.19, because of the double slash
         FORGEJO=${FORGEJO%%/}
@@ -67,17 +68,8 @@ runs:
         export HOST=${FORGEJO#*://}
 
         export REPO="${{ inputs.repo }}"
-        if test -z "$REPO"; then
-          export REPO="${{ github.repository }}"
-        fi
 
         export TAG="${{ inputs.tag }}"
-        if test -z "$TAG"; then
-          export TAG="${{ github.ref_name }}"
-          # until https://code.forgejo.org/forgejo/runner/issues/9 is fixed
-          # trim refs/tags/
-          TAG=${TAG##refs/tags/}
-        fi
 
         export TITLE="${{ inputs.title }}"
 
@@ -99,9 +91,6 @@ runs:
         )
 
         export SHA="${{ inputs.sha }}"
-        if test -z "$SHA"; then
-          export SHA="${{ github.sha }}"
-        fi
 
         export OVERRIDE="${{ inputs.override }}"
 

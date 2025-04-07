@@ -10,12 +10,12 @@ Upload or download the assets of a release to a Forgejo instance.
 
 | name | description | required | default |
 | --- | --- | --- | --- |
-| `url` | <p>URL of the Forgejo instance</p> | `false` | `""` |
-| `repo` | <p>owner/project relative to the URL</p> | `false` | `""` |
-| `tag` | <p>Tag of the release</p> | `false` | `""` |
+| `url` | <p>URL of the Forgejo instance</p> | `false` | `${{ env.GITHUB_SERVER_URL }}` |
+| `repo` | <p>owner/project relative to the URL</p> | `false` | `${{ github.repository }}` |
+| `tag` | <p>Tag of the release</p> | `false` | `${{ github.ref_name }}` |
 | `title` | <p>Title of the release (defaults to tag)</p> | `false` | `""` |
-| `sha` | <p>SHA of the release</p> | `false` | `""` |
-| `token` | <p>Forgejo application token</p> | `true` | `""` |
+| `sha` | <p>SHA of the release</p> | `false` | `${{ github.sha }}` |
+| `token` | <p>Forgejo application token</p> | `false` | `${{ secrets.GITHUB_TOKEN }}` |
 | `release-dir` | <p>Directory in whichs release assets are uploaded or downloaded</p> | `true` | `""` |
 | `release-notes` | <p>Release notes</p> | `false` | `""` |
 | `direction` | <p>Can either be <code>download</code> or <code>upload</code></p> | `true` | `""` |
