@@ -37,16 +37,18 @@ Upload or download the assets of a release to a Forgejo instance.
 Upload the release located in `release-dir` to the release section of a repository (`url` and `repo`):
 
 ```yaml
-on: [tag]
 jobs:
   upload-release:
-    runs-on: ubuntu-latest
+    runs-on: docker
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/forgejo-release@v2
+      - uses: actions/checkout@v4
+      - uses: actions/forgejo-release@v2.6.0
         with:
           direction: upload
-          url: https://code.forgejo.org
+          url: https://my-forgejo-instance.net
+          repo: myuser/myrepo
+          token: ${{ secrets.WRITE_TOKEN_TO_MYREPO }}
+          tag: v1.0.0
           release-dir: dist/release
           release-notes: "MY RELEASE NOTES"
 ```
@@ -56,24 +58,24 @@ jobs:
 Example downloading the forgejo release v1.21.4-0 into the working directory:
 
 ```yaml
-on: [tag]
 jobs:
   download-release:
-    runs-on: ubuntu-latest
+    runs-on: docker
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/forgejo-release@v2
+      - uses: actions/checkout@v4
+      - uses: actions/forgejo-release@v2.6.0
         with:
           direction: download
-          url: https://code.forgejo.org
-          repo: forgejo/forgejo
-          tag: v1.21.4-0
+          url: https://my-forgejo-instance.net
+          repo: myuser/myrepo
+          token: ${{ secrets.READ_TOKEN_TO_MYREPO }}
+          tag: v1.0.0
           release-dir: ./  # by default, files are downloaded into dist/release
 ```
 
 ### Real world example
 
-This action is used to [publish](https://code.forgejo.org/forgejo/release-notes-assistant/src/branch/main/.forgejo/workflows/release.yml) the release notes assistant assets.
+This action is used to [publish](https://code.forgejo.org/forgejo/release-notes-assistant/src/commit/09f2c22d80d5ee655783cfeb2c1d4bab4afec3e4/.forgejo/workflows/release.yml) the release notes assistant assets.
 
 ## Update the `input` section of the README
 
