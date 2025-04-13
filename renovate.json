@@ -1,6 +1,18 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "local>actions/renovate-config"
-  ]
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["local>actions/renovate-config"],
+    "customManagers": [
+        {
+            "customType": "regex",
+            "description": "update example in README.md",
+            "fileMatch": ["^README.md$"],
+            "matchStrings": [
+                "uses: actions/forgejo-release@(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+            ],
+            "datasourceTemplate": "gitea-tags",
+            "depNameTemplate": "actions/forgejo-release",
+            "versioningTemplate": "semver",
+            "registryUrlTemplate": "https://code.forgejo.org"
+        }
+    ]
 }
