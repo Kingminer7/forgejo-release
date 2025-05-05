@@ -1,11 +1,15 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": ["local>actions/renovate-config"],
+    "extends": [
+        "local>actions/renovate-config"
+    ],
     "customManagers": [
         {
             "customType": "regex",
             "description": "update example in README.md",
-            "fileMatch": ["^README.md$"],
+            "managerFilePatterns": [
+                "/^README.md$/"
+            ],
             "matchStrings": [
                 "uses: actions/forgejo-release@(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
             ],
