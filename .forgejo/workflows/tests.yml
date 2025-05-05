@@ -3,7 +3,7 @@ jobs:
   integration:
     runs-on: docker
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Unit tests of the supporting script forgejo-release.sh
         run: |
