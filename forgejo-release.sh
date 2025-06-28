@@ -12,7 +12,7 @@ if ${VERBOSE:-false}; then set -x; fi
 : ${DOWNLOAD_LATEST:=false}
 : ${TMP_DIR:=$(mktemp -d)}
 : ${GNUPGHOME:=$TMP_DIR}
-: ${BIN_DIR:=$TMP_DIR}
+: ${TEA_BIN:=$TMP_DIR/tea}
 : ${TEA_VERSION:=0.9.0}
 : ${OVERRIDE:=false}
 : ${HIDE_ARCHIVE_LINK:=false}
@@ -24,10 +24,12 @@ TAG_FILE="$TMP_DIR/tag$$.json"
 export GNUPGHOME
 
 setup_tea() {
-    if ! test -f "$BIN_DIR"/tea; then
+    if which tea 2>/dev/null; then
+        TEA_BIN=$(which tea)
+    else ! test -f $TEA_BIN;
         ARCH=$(dpkg --print-architecture)
-        curl -sL https://dl.gitea.io/tea/$TEA_VERSION/tea-$TEA_VERSION-linux-"$ARCH" >"$BIN_DIR"/tea
-        chmod +x "$BIN_DIR"/tea
+        curl -sL https://dl.gitea.io/tea/$TEA_VERSION/tea-$TEA_VERSION-linux-"$ARCH" >$TEA_BIN
+        chmod +x $TEA_BIN
     fi
 }
 
@@ -89,11 +91,11 @@ upload_release() {
         echo "Uploading as Stable"
     fi
     ensure_tag
-    if ! "$BIN_DIR"/tea release create "${assets[@]}" --repo $REPO --note "$RELEASENOTES" --tag "$TAG" --title "$TITLE" --draft ${releaseType} >&"$TMP_DIR"/tea.log; then
+    if ! $TEA_BIN release create "${assets[@]}" --repo $REPO --note "$RELEASENOTES" --tag "$TAG" --title "$TITLE" --draft ${releaseType} >&"$TMP_DIR"/tea.log; then
         if grep --quiet 'Unknown API Error: 500' "$TMP_DIR"/tea.log && grep --quiet services/release/release.go:194 "$TMP_DIR"/tea.log; then
             echo "workaround v1.20 race condition https://codeberg.org/forgejo/forgejo/issues/1370"
             sleep 10
-            "$BIN_DIR"/tea release create "${assets[@]}" --repo $REPO --note "$RELEASENOTES" --tag "$TAG" --title "$TITLE" --draft ${releaseType}
+            $TEA_BIN release create "${assets[@]}" --repo $REPO --note "$RELEASENOTES" --tag "$TAG" --title "$TITLE" --draft ${releaseType}
         else
             cat "$TMP_DIR"/tea.log
             return 1
@@ -153,7 +155,7 @@ upload() {
     setup_api
     setup_tea
     rm -f ~/.config/tea/config.yml
-    GITEA_SERVER_TOKEN=$TOKEN "$BIN_DIR"/tea login add --url $FORGEJO
+    GITEA_SERVER_TOKEN=$TOKEN $TEA_BIN login add --url $FORGEJO
     maybe_sign_release
     maybe_override
     upload_release
