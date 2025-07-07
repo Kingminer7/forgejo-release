@@ -99,7 +99,7 @@ jobs:
         with:
           direction: upload
           tag: v1.2
-          token: FORGEJO_TOKEN
+          token: FORGEJO_TEST_TOKEN
           release-dir: upload-dir
           release-notes: "RELEASE NOTES"
           gpg-private-key: ${{ env.gpg_private_key }}
@@ -110,7 +110,7 @@ jobs:
         with:
           direction: download
           tag: v1.2
-          token: FORGEJO_TOKEN
+          token: FORGEJO_TEST_TOKEN
           release-dir: download-dir
           verbose: true
       - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
