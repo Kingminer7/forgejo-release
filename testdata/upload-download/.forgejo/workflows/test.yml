@@ -46,6 +46,28 @@ jobs:
             - !exclamation_mark
           verbose: true
       - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        id: release-upload-slash-in-tag
+        uses: SELF@vTest
+        with:
+          direction: upload
+          tag: a/v3.0
+          token: FORGEJO_TOKEN
+          release-dir: upload-dir
+          release-notes: "RELEASE NOTES"
+          verbose: true
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        id: release-upload-override-slash-in-tag
+        uses: SELF@vTest
+        with:
+          direction: upload
+          tag: a/v3.0
+          token: FORGEJO_TOKEN
+          release-dir: upload-dir
+          release-notes-assistant: true
+          hide-archive-link: true
+          override: true
+          verbose: true
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         id: release-download
         uses: SELF@vTest
         with:
@@ -69,5 +91,18 @@ jobs:
       - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         run: |
           diff -u upload-dir-v2 download-dir-v2
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        id: release-download-with-slash-in-tag
+        uses: SELF@vTest
+        with:
+          direction: download
+          tag: a/v3.0
+          token: FORGEJO_TEST_TOKEN
+          release-dir: download-dir-v3a
+          download-latest: true
+          verbose: true
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        run: |
+          diff -u upload-dir download-dir-v3a
       - if: failure()
         run: docker logs forgejo

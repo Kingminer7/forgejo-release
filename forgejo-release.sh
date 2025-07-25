@@ -20,6 +20,7 @@ if ${VERBOSE:-false}; then set -x; fi
 : ${DELAY:=10}
 
 TAG_FILE="$TMP_DIR/tag$$.json"
+TAG_URL=$(echo "$TAG" | sed 's/\//%2F/g')
 
 export GNUPGHOME
 
@@ -35,7 +36,7 @@ setup_tea() {
 
 get_tag() {
     if ! test -f "$TAG_FILE"; then
-        if api GET repos/$REPO/tags/"$TAG" >"$TAG_FILE"; then
+        if api GET repos/$REPO/tags/"$TAG_URL" >"$TAG_FILE"; then
             echo "tag $TAG exists"
         else
             echo "tag $TAG does not exists"
@@ -71,7 +72,7 @@ create_tag() {
 
 delete_tag() {
     if get_tag; then
-        api DELETE repos/$REPO/tags/$TAG
+        api DELETE repos/$REPO/tags/"$TAG_URL"
         rm -f "$TAG_FILE"
     fi
 }
@@ -108,7 +109,7 @@ upload_release() {
 release_draft() {
     local state="$1"
 
-    local id=$(api GET repos/$REPO/releases/tags/"$TAG" | jq --raw-output .id)
+    local id=$(api GET repos/$REPO/releases/tags/"$TAG_URL" | jq --raw-output .id)
 
     api PATCH repos/$REPO/releases/"$id" --data-raw '{"draft": '"$state"', "hide_archive_links": '$HIDE_ARCHIVE_LINK'}'
 }
@@ -145,7 +146,7 @@ maybe_override() {
     if test "$OVERRIDE" = "false"; then
         return
     fi
-    api DELETE repos/$REPO/releases/tags/"$TAG" >&/dev/null || true
+    api DELETE repos/$REPO/releases/tags/"$TAG_URL" >&/dev/null || true
     if get_tag && ! matched_tag; then
         delete_tag
     fi
@@ -180,7 +181,7 @@ api() {
 wait_release() {
     local ready=false
     for i in $(seq $RETRY); do
-        if api GET repos/$REPO/releases/tags/"$TAG" | jq --raw-output .draft >"$TMP_DIR"/draft; then
+        if api GET repos/$REPO/releases/tags/"$TAG_URL" | jq --raw-output .draft >"$TMP_DIR"/draft; then
             if test "$(cat "$TMP_DIR"/draft)" = "false"; then
                 ready=true
                 break
@@ -209,9 +210,10 @@ download() {
         elif [[ ${DOWNLOAD_LATEST} == "false" ]]; then
             wait_release
             echo "Downloading tagged release ${TAG}"
-            api GET repos/$REPO/releases/tags/"$TAG" >"$TMP_DIR"/assets.json
+            api GET repos/$REPO/releases/tags/"$TAG_URL" >"$TMP_DIR"/assets.json
         fi
         jq --raw-output '.assets[] | "\(.browser_download_url) \(.name)"' <"$TMP_DIR"/assets.json | while read url name; do # `name` may contain whitespace, therefore, it must be last
+            url=$(echo "$url" | sed "s#/download/${TAG}/#/download/${TAG_URL}/#")
             curl --fail -H "Authorization: token $TOKEN" -o "$name" -L "$url"
         done
     )
