@@ -98,7 +98,7 @@ jobs:
         uses: SELF@vTest
         with:
           direction: upload
-          tag: v1.2
+          tag: v1.3
           token: FORGEJO_TEST_TOKEN
           release-dir: upload-dir
           release-notes: "RELEASE NOTES"
@@ -109,7 +109,7 @@ jobs:
         uses: SELF@vTest
         with:
           direction: download
-          tag: v1.2
+          tag: v1.3
           token: FORGEJO_TEST_TOKEN
           release-dir: download-dir
           verbose: true

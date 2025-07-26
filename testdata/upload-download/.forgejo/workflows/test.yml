@@ -4,7 +4,7 @@ name: Upload (and download) a release to (and from) the project that runs the wo
 on: [push]
 jobs:
   upload-download:
-    runs-on: self-hosted
+    runs-on: lxc-bookworm
     steps:
       - uses: actions/checkout@v4
       - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
@@ -46,28 +46,6 @@ jobs:
             - !exclamation_mark
           verbose: true
       - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-        id: release-upload-slash-in-tag
-        uses: SELF@vTest
-        with:
-          direction: upload
-          tag: a/v3.0
-          token: FORGEJO_TOKEN
-          release-dir: upload-dir
-          release-notes: "RELEASE NOTES"
-          verbose: true
-      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-        id: release-upload-override-slash-in-tag
-        uses: SELF@vTest
-        with:
-          direction: upload
-          tag: a/v3.0
-          token: FORGEJO_TOKEN
-          release-dir: upload-dir
-          release-notes-assistant: true
-          hide-archive-link: true
-          override: true
-          verbose: true
-      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         id: release-download
         uses: SELF@vTest
         with:
@@ -91,18 +69,28 @@ jobs:
       - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         run: |
           diff -u upload-dir-v2 download-dir-v2
+
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        id: release-upload-slash-in-tag
+        uses: SELF@vTest
+        with:
+          direction: upload
+          tag: v/3.0
+          token: FORGEJO_TEST_TOKEN
+          release-dir: upload-dir-v3
+          release-notes: "RELEASE NOTES"
+          verbose: true
       - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         id: release-download-with-slash-in-tag
         uses: SELF@vTest
         with:
           direction: download
-          tag: a/v3.0
+          tag: v/3.0
           token: FORGEJO_TEST_TOKEN
-          release-dir: download-dir-v3a
-          download-latest: true
+          release-dir: download-dir-v3
           verbose: true
       - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         run: |
-          diff -u upload-dir download-dir-v3a
+          diff -u upload-dir-v3 download-dir-v3
       - if: failure()
         run: docker logs forgejo
