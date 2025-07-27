@@ -29,7 +29,7 @@ export GNUPGHOME
 setup_tea() {
     if which tea 2>/dev/null; then
         TEA_BIN=$(which tea)
-    else ! test -f $TEA_BIN;
+    elif ! test -f $TEA_BIN; then
         ARCH=$(dpkg --print-architecture)
         curl -sL https://dl.gitea.io/tea/$TEA_VERSION/tea-$TEA_VERSION-linux-"$ARCH" >$TEA_BIN
         chmod +x $TEA_BIN
