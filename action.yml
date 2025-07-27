@@ -57,6 +57,12 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - if: ${{ inputs.release-notes-assistant }}
+      uses: https://data.forgejo.org/actions/cache@v4
+      with:
+        key: rna-${{ inputs.repo }}
+        path: ${{ forge.action_path }}/rna
+
     - run: echo "${{ forge.action_path }}" >> $FORGEJO_PATH
       shell: bash
     - run: |
@@ -78,6 +84,7 @@ runs:
         export PRERELEASE="${{ inputs.prerelease }}"
 
         export RELEASE_NOTES_ASSISTANT="${{ inputs.release-notes-assistant }}"
+        export RELEASE_NOTES_ASSISTANT_WORKDIR=${{ forge.action_path }}/rna
 
         export HIDE_ARCHIVE_LINK="${{ inputs.hide-archive-link }}"
 
