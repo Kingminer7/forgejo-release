@@ -19,7 +19,7 @@ if ${VERBOSE:-false}; then set -x; fi
 : ${RETRY:=1}
 : ${DELAY:=10}
 
-RELEASE_NOTES_ASSISTANT_VERSION=v1.3.3 # renovate: datasource=forgejo-releases depName=forgejo/release-notes-assistant registryUrl=https://code.forgejo.org
+RELEASE_NOTES_ASSISTANT_VERSION=v1.3.5 # renovate: datasource=forgejo-releases depName=forgejo/release-notes-assistant registryUrl=https://code.forgejo.org
 
 TAG_FILE="$TMP_DIR/tag$$.json"
 TAG_URL=$(echo "$TAG" | sed 's/\//%2F/g')

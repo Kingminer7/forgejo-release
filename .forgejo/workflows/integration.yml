@@ -61,5 +61,11 @@ jobs:
           export VERBOSE=true
           testdata/forgejo-release-test.sh test_run testuser otherrepo
 
-      - if: failure()
-        run: docker logs forgejo
+      - if: always()
+        name: '[RUNNER] and [FORGEJO] logs'
+        run: |
+          runner_logs="${{ steps.forgejo.outputs.runner-logs }}"
+          if test -f "$runner_logs"; then
+            sed -e 's/^/[RUNNER] /' < $runner_logs
+          fi
+          docker logs forgejo | sed -e 's/^/[FORGEJO] /'

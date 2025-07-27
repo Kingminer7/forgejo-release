@@ -6,21 +6,21 @@ description: |
 inputs:
   url:
     description: 'URL of the Forgejo instance'
-    default: '${{ env.GITHUB_SERVER_URL }}'
+    default: '${{ env.FORGEJO_SERVER_URL }}'
   repo:
     description: 'owner/project relative to the URL'
-    default: '${{ github.repository }}'
+    default: '${{ forge.repository }}'
   tag:
     description: 'Tag of the release'
-    default: '${{ github.ref_name }}'
+    default: '${{ forge.ref_name }}'
   title:
     description: 'Title of the release (defaults to tag)'
   sha:
     description: 'SHA of the release'
-    default: '${{ github.sha }}'
+    default: '${{ forge.sha }}'
   token:
     description: 'Forgejo application token'
-    default: '${{ secrets.GITHUB_TOKEN }}'
+    default: '${{ forge.token }}'
   release-dir:
     description: 'Directory in whichs release assets are uploaded or downloaded'
     required: true
@@ -57,7 +57,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: echo "${{ github.action_path }}" >> $GITHUB_PATH
+    - run: echo "${{ forge.action_path }}" >> $FORGEJO_PATH
       shell: bash
     - run: |
         export FORGEJO="${{ inputs.url }}"
