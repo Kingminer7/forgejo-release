@@ -19,6 +19,8 @@ if ${VERBOSE:-false}; then set -x; fi
 : ${RETRY:=1}
 : ${DELAY:=10}
 
+RELEASE_NOTES_ASSISTANT_VERSION=v1.3.3 # renovate: datasource=forgejo-releases depName=forgejo/release-notes-assistant registryUrl=https://code.forgejo.org
+
 TAG_FILE="$TMP_DIR/tag$$.json"
 TAG_URL=$(echo "$TAG" | sed 's/\//%2F/g')
 
@@ -116,7 +118,7 @@ release_draft() {
 
 maybe_use_release_note_assistant() {
     if "$RELEASE_NOTES_ASSISTANT"; then
-        curl --fail -s -S -o rna https://code.forgejo.org/forgejo/release-notes-assistant/releases/download/v1.2.3/release-notes-assistant
+        curl --fail -s -S -o rna https://code.forgejo.org/forgejo/release-notes-assistant/releases/download/$RELEASE_NOTES_ASSISTANT_VERSION/release-notes-assistant
         chmod +x ./rna
         ./rna --storage release --storage-location "$TAG" --forgejo-url "$SCHEME"://placeholder:"$TOKEN"@"$HOST" --repository $REPO --token "$TOKEN" release "$TAG"
     fi
