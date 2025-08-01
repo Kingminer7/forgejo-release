@@ -121,7 +121,7 @@ maybe_use_release_note_assistant() {
         curl --fail -s -S -o rna https://code.forgejo.org/forgejo/release-notes-assistant/releases/download/$RELEASE_NOTES_ASSISTANT_VERSION/release-notes-assistant
         chmod +x ./rna
         mkdir -p $RELEASE_NOTES_ASSISTANT_WORKDIR
-        ./rna --workdir=$RELEASE_NOTES_ASSISTANT_WORKDIR --storage release --storage-location "$TAG" --forgejo-url "$SCHEME"://placeholder:"$TOKEN"@"$HOST" --repository $REPO --token "$TOKEN" release "$TAG"
+        ./rna --workdir=$RELEASE_NOTES_ASSISTANT_WORKDIR --storage release --storage-location "$TAG" --token "$TOKEN" --forgejo-url "$SCHEME://$HOST" --repository $REPO --token "$TOKEN" release "$TAG"
     fi
 }
 
