@@ -88,7 +88,7 @@ runs:
 
         export HIDE_ARCHIVE_LINK="${{ inputs.hide-archive-link }}"
 
-        export TOKEN="${{ inputs.token }}"
+        export TOKEN=${{ inputs.token }}
 
         export RELEASE_DIR="${{ inputs.release-dir }}"
 
