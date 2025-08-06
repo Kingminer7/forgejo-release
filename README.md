@@ -42,7 +42,7 @@ jobs:
     runs-on: docker
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/forgejo-release@v2.7.1
+      - uses: actions/forgejo-release@v2.7.2
         with:
           direction: upload
           url: https://my-forgejo-instance.net
@@ -63,7 +63,7 @@ jobs:
     runs-on: docker
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/forgejo-release@v2.7.1
+      - uses: actions/forgejo-release@v2.7.2
         with:
           direction: download
           url: https://my-forgejo-instance.net
