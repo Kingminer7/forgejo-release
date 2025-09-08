@@ -1,6 +1,6 @@
 on: [ pull_request, push ]
 jobs:
-  integration:
+  tests:
     runs-on: docker
     steps:
       - uses: actions/checkout@v4
