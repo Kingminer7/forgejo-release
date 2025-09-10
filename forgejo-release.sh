@@ -13,7 +13,7 @@ if ${VERBOSE:-false}; then set -x; fi
 : ${TMP_DIR:=$(mktemp -d)}
 : ${GNUPGHOME:=$TMP_DIR}
 : ${TEA_BIN:=$TMP_DIR/tea}
-: ${TEA_VERSION:=0.9.0}
+: ${TEA_VERSION:=0.10.1}
 : ${OVERRIDE:=false}
 : ${HIDE_ARCHIVE_LINK:=false}
 : ${RETRY:=1}
