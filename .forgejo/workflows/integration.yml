@@ -1,4 +1,10 @@
 on: [ pull_request, push ]
+
+
+env:
+  FORGEJO_VERSION: 11.0.7 # renovate: datasource=docker depName=code.forgejo.org/forgejo/forgejo
+
+
 jobs:
   integration:
     runs-on: self-hosted
@@ -10,7 +16,7 @@ jobs:
         with:
           user: testuser
           password: admin1234
-          image-version: 9
+          image-version: ${{ env.FORGEJO_VERSION }}
 
       - name: push self
         run: |
