@@ -15,7 +15,7 @@ Upload or download the assets of a release to a Forgejo instance.
 | `tag` | <p>Tag of the release</p> | `false` | `${{ github.ref_name }}` |
 | `title` | <p>Title of the release (defaults to tag)</p> | `false` | `""` |
 | `sha` | <p>SHA of the release</p> | `false` | `${{ github.sha }}` |
-| `token` | <p>Forgejo application token</p> | `false` | `${{ secrets.GITHUB_TOKEN }}` |
+| `token` | <p>Forgejo application token (must have `write:repository`)</p> | `false` | `${{ secrets.GITHUB_TOKEN }}` |
 | `release-dir` | <p>Directory in whichs release assets are uploaded or downloaded</p> | `true` | `""` |
 | `release-notes` | <p>Release notes</p> | `false` | `""` |
 | `direction` | <p>Can either be <code>download</code> or <code>upload</code></p> | `true` | `""` |
