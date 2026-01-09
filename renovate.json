@@ -3,6 +3,14 @@
     "extends": [
         "local>actions/renovate-config"
     ],
+    "packageRules": [
+        {
+            "description": "separate multiple major and minor for forgejo",
+            "matchDepNames": ["code.forgejo.org/forgejo/forgejo"],
+            "separateMultipleMajor": true,
+            "separateMultipleMinor": true
+        }
+    ],
     "customManagers": [
         {
             "customType": "regex",
