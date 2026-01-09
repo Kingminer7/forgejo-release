@@ -27,7 +27,7 @@ jobs:
   upload-gpg:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         id: release-upload
         uses: SELF@vTest

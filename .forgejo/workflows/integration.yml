@@ -9,7 +9,7 @@ jobs:
   integration:
     runs-on: lxc-trixie
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - id: forgejo
         uses: https://code.forgejo.org/actions/setup-forgejo@v3.1.0
