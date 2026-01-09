@@ -6,6 +6,10 @@
 #
 name: two Forgejo
 on: [push]
+
+env:
+  FORGEJO_VERSION: 11.0.9 # renovate: datasource=docker depName=code.forgejo.org/forgejo/forgejo
+
 jobs:
   setup-forgejo:
     runs-on: self-hosted
@@ -17,7 +21,7 @@ jobs:
           user: testuser
           password: admin1234
           lxc-ip-prefix: 10.0.15
-          image-version: 1.20
+          image-version: ${{ env.FORGEJO_VERSION }}
       - id: testrepo
         run: |
           url=http://testuser:admin1234@${{ steps.forgejo.outputs.host-port }}
