@@ -7,7 +7,7 @@ env:
 
 jobs:
   integration:
-    runs-on: self-hosted
+    runs-on: lxc-trixie
     steps:
       - uses: actions/checkout@v4
 
