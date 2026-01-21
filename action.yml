@@ -22,8 +22,8 @@ inputs:
     description: 'Forgejo application token'
     default: '${{ forge.token }}'
   release-dir:
-    description: 'Directory in whichs release assets are uploaded or downloaded'
-    required: true
+    description: 'Directory in which release assets are uploaded or downloaded'
+    default: ''
   release-notes:
     description: 'Release notes'
   direction:
@@ -53,6 +53,9 @@ inputs:
   hide-archive-link:
     description: 'Hide the archive links'
     default: false
+  skip-assets:
+    description: Skip uploading release assets
+    default: 'false'
 
 runs:
   using: "composite"
@@ -112,6 +115,8 @@ runs:
         export GPG_PRIVATE_KEY=$TMP_DIR/gpg-private-key
         echo -n "${{ inputs.gpg-passphrase }}" > $TMP_DIR/gpg-passphrase
         export GPG_PASSPHRASE="$TMP_DIR/gpg-passphrase"
+
+        export SKIP_ASSETS="${{ inputs.skip-assets }}"
 
         forgejo-release.sh ${{ inputs.direction }}
       shell: bash

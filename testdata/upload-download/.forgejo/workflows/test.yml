@@ -92,5 +92,35 @@ jobs:
       - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         run: |
           diff -u upload-dir-v3 download-dir-v3
+
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        id: release-upload-v4
+        uses: SELF@vTest
+        with:
+          direction: upload
+          tag: v4.0
+          token: FORGEJO_TEST_TOKEN
+          skip-assets: true
+          verbose: true
+
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        id: release-download-v4
+        uses: SELF@vTest
+        with:
+          direction: download
+          tag: v4.0
+          token: FORGEJO_TEST_TOKEN
+          release-dir: download-dir-v4
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        run: |
+          if [ ! -d download-dir-v4 ]; then
+            echo "Missing download dir"
+            exit 1
+          fi
+          if [ ! -z "$( ls -A download-dir-v4 )" ]; then
+            echo "Unexpected download files: $( ls -A download-dir-v4 )"
+            exit 1
+          fi
+
       - if: failure()
         run: docker logs forgejo

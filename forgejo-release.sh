@@ -84,9 +84,11 @@ upload_release() {
     # It is expanded using "${assets[@]}" which preserves the separation of arguments and not split whitespace containing values.
     # For reference, see https://github.com/koalaman/shellcheck/wiki/SC2086#exceptions
     local assets=()
-    for file in "$RELEASE_DIR"/*; do
-        assets=("${assets[@]}" -a "$file")
-    done
+    if ! "$SKIP_ASSETS"; then
+        for file in "$RELEASE_DIR"/*; do
+            assets=("${assets[@]}" -a "$file")
+        done
+    fi
     if $PRERELEASE || echo "${TAG}" | grep -qi '\-rc'; then
         releaseType="--prerelease"
         echo "Uploading as Pre-Release"
