@@ -10,13 +10,13 @@ Upload or download the assets of a release to a Forgejo instance.
 
 | name | description | required | default |
 | --- | --- | --- | --- |
-| `url` | <p>URL of the Forgejo instance</p> | `false` | `${{ env.GITHUB_SERVER_URL }}` |
-| `repo` | <p>owner/project relative to the URL</p> | `false` | `${{ github.repository }}` |
-| `tag` | <p>Tag of the release</p> | `false` | `${{ github.ref_name }}` |
+| `url` | <p>URL of the Forgejo instance</p> | `false` | `${{ env.FORGEJO_SERVER_URL }}` |
+| `repo` | <p>owner/project relative to the URL</p> | `false` | `${{ forge.repository }}` |
+| `tag` | <p>Tag of the release</p> | `false` | `${{ forge.ref_name }}` |
 | `title` | <p>Title of the release (defaults to tag)</p> | `false` | `""` |
-| `sha` | <p>SHA of the release</p> | `false` | `${{ github.sha }}` |
-| `token` | <p>Forgejo application token (must have `write:repository`)</p> | `false` | `${{ secrets.GITHUB_TOKEN }}` |
-| `release-dir` | <p>Directory in whichs release assets are uploaded or downloaded</p> | `true` | `""` |
+| `sha` | <p>SHA of the release</p> | `false` | `${{ forge.sha }}` |
+| `token` | <p>Forgejo application token (must have <code>write:repository</code>)</p> | `false` | `${{ forge.token }}` |
+| `release-dir` | <p>Directory in which release assets are uploaded or downloaded</p> | `false` | `dist/release` |
 | `release-notes` | <p>Release notes</p> | `false` | `""` |
 | `direction` | <p>Can either be <code>download</code> or <code>upload</code></p> | `true` | `""` |
 | `gpg-private-key` | <p>GPG Private Key to sign the release artifacts</p> | `false` | `""` |
@@ -28,6 +28,7 @@ Upload or download the assets of a release to a Forgejo instance.
 | `prerelease` | <p>Mark Release as Pre-Release</p> | `false` | `false` |
 | `release-notes-assistant` | <p>Generate release notes with Release Notes Assistant</p> | `false` | `false` |
 | `hide-archive-link` | <p>Hide the archive links</p> | `false` | `false` |
+| `skip-assets` | <p>Skip uploading release assets</p> | `false` | `false` |
 <!-- action-docs-inputs source="action.yml" -->
 
 ## Examples
@@ -83,5 +84,5 @@ Using [action-docs](https://github.com/npalm/action-docs):
 
 ```shell
 # Edit the action.yml file and run:
-action-docs --update-readme
+npx action-docs --update-readme
 ```

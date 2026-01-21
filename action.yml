@@ -19,11 +19,11 @@ inputs:
     description: 'SHA of the release'
     default: '${{ forge.sha }}'
   token:
-    description: 'Forgejo application token'
+    description: 'Forgejo application token (must have `write:repository`)'
     default: '${{ forge.token }}'
   release-dir:
     description: 'Directory in which release assets are uploaded or downloaded'
-    default: ''
+    default: 'dist/release'
   release-notes:
     description: 'Release notes'
   direction:
@@ -37,22 +37,22 @@ inputs:
     description: 'Number of times to retry if the release is not ready (default 1)'
   download-latest:
     description: 'Download the latest release'
-    default: false
+    default: 'false'
   verbose:
     description: 'Increase the verbosity level'
-    default: false
+    default: 'false'
   override:
     description: 'Override an existing release by the same `{tag}`'
-    default: false
+    default: 'false'
   prerelease:
     description: 'Mark Release as Pre-Release'
-    default: false
+    default: 'false'
   release-notes-assistant:
     description: 'Generate release notes with Release Notes Assistant'
-    default: false
+    default: 'false'
   hide-archive-link:
     description: 'Hide the archive links'
-    default: false
+    default: 'false'
   skip-assets:
     description: Skip uploading release assets
     default: 'false'

@@ -1,9 +1,21 @@
-on: [ pull_request, push ]
+on: [pull_request, push]
 jobs:
   tests:
     runs-on: docker
+    container:
+      image: data.forgejo.org/oci/node:24-trixie
+
     steps:
       - uses: actions/checkout@v6
+
+      - name: lint action-docs
+        run: |
+          npx --yes action-docs -u
+          git diff --quiet || {
+            echo "[ERROR] Please apply the changes action-docs suggests:"
+            git diff --color=always
+            exit 1
+          }
 
       - name: Unit tests of the supporting script forgejo-release.sh
         run: |
