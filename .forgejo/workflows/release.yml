@@ -1,0 +1,22 @@
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  publish:
+    runs-on: docker
+    container:
+      image: data.forgejo.org/oci/node:24-trixie
+
+    steps:
+      - uses: https://data.forgejo.org/actions/checkout@v6
+
+      - name: publish release
+        uses: ./
+        with:
+          direction: upload
+          override: ${{ vars.OVERRIDE || 'false' }}
+          verbose: ${{ vars.VERBOSE || 'false' }}
+          release-notes-assistant: true
+          skip-assets: true
