@@ -1,9 +1,11 @@
-on: [ pull_request, push ]
-
+on:
+  pull_request:
+  push:
+    branches:
+      - "**"
 
 env:
   FORGEJO_VERSION: 11.0.10 # renovate: datasource=docker depName=code.forgejo.org/forgejo/forgejo
-
 
 jobs:
   integration:
@@ -68,7 +70,7 @@ jobs:
           testdata/forgejo-release-test.sh test_run testuser otherrepo
 
       - if: always()
-        name: '[RUNNER] and [FORGEJO] logs'
+        name: "[RUNNER] and [FORGEJO] logs"
         run: |
           runner_logs="${{ steps.forgejo.outputs.runner-logs }}"
           if test -f "$runner_logs"; then
