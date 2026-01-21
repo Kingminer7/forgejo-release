@@ -6,14 +6,15 @@ on:
 jobs:
   publish:
     runs-on: docker
-    container:
-      image: data.forgejo.org/oci/node:24-trixie
 
     steps:
+      # needs to be in a different dir, so binary and rna cache don't conflict
       - uses: https://data.forgejo.org/actions/checkout@v6
+        with:
+          path: forgejo-release
 
       - name: publish release
-        uses: ./
+        uses: ./forgejo-release
         with:
           direction: upload
           override: ${{ vars.OVERRIDE || 'false' }}
