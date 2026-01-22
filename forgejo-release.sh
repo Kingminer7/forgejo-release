@@ -18,6 +18,7 @@ if ${VERBOSE:-false}; then set -x; fi
 : ${HIDE_ARCHIVE_LINK:=false}
 : ${RETRY:=1}
 : ${DELAY:=10}
+: ${SKIP_ASSETS:=false}
 
 RELEASE_NOTES_ASSISTANT_VERSION=v1.5.1 # renovate: datasource=forgejo-releases depName=forgejo/release-notes-assistant registryUrl=https://code.forgejo.org
 
@@ -84,7 +85,7 @@ upload_release() {
     # It is expanded using "${assets[@]}" which preserves the separation of arguments and not split whitespace containing values.
     # For reference, see https://github.com/koalaman/shellcheck/wiki/SC2086#exceptions
     local assets=()
-    if ! "$SKIP_ASSETS"; then
+    if [ "$SKIP_ASSETS" == 'false' ]; then
         for file in "$RELEASE_DIR"/*; do
             assets=("${assets[@]}" -a "$file")
         done
@@ -209,7 +210,7 @@ download() {
     (
         mkdir -p $RELEASE_DIR
         cd $RELEASE_DIR
-        if [[ ${DOWNLOAD_LATEST} == "true" ]]; then
+        if [[ ${DOWNLOAD_LATEST} = "true" ]]; then
             echo "Downloading the latest release"
             api GET repos/$REPO/releases/latest >"$TMP_DIR"/assets.json
         elif [[ ${DOWNLOAD_LATEST} == "false" ]]; then
