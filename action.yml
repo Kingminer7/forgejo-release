@@ -26,6 +26,8 @@ inputs:
     default: 'dist/release'
   release-notes:
     description: 'Release notes'
+  release-notes-file:
+    description: 'Path to a file containing your release notes (takes priority over `release-notes`)'
   direction:
     description: 'Can either be `download` or `upload`'
     required: true
@@ -99,6 +101,16 @@ runs:
         ${{ inputs.release-notes }}
         EOF
         )
+
+        RELEASENOTES_FILE="${{ inputs.release-notes-file }}"
+        if [ ! -z "$RELEASENOTES_FILE" ]; then
+          if [ ! -f "$RELEASENOTES_FILE" ]; then
+            echo "! Release notes file $RELEASENOTES_FILE does not exist."
+            exit 1
+          fi
+
+          export RELEASENOTES=$(cat "$RELEASENOTES_FILE")
+        fi
 
         export SHA="${{ inputs.sha }}"
 

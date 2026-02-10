@@ -18,6 +18,7 @@ Upload or download the assets of a release to a Forgejo instance.
 | `token` | <p>Forgejo application token (must have <code>write:repository</code>)</p> | `false` | `${{ forge.token }}` |
 | `release-dir` | <p>Directory in which release assets are uploaded or downloaded</p> | `false` | `dist/release` |
 | `release-notes` | <p>Release notes</p> | `false` | `""` |
+| `release-notes-file` | <p>Path to a file containing your release notes (takes priority over <code>release-notes</code>)</p> | `false` | `""` |
 | `direction` | <p>Can either be <code>download</code> or <code>upload</code></p> | `true` | `""` |
 | `gpg-private-key` | <p>GPG Private Key to sign the release artifacts</p> | `false` | `""` |
 | `gpg-passphrase` | <p>Passphrase of the GPG Private Key</p> | `false` | `""` |
@@ -52,6 +53,27 @@ jobs:
           tag: v1.0.0
           release-dir: dist/release
           release-notes: "MY RELEASE NOTES"
+```
+
+Upload a release with custom release notes located in a file:
+
+```yaml
+jobs:
+  upload-release:
+    runs-on: docker
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate Changelog
+        run: ./generate-changelog.sh > dist/changelog.md
+      - uses: actions/forgejo-release@v2.7.3
+        with:
+          direction: upload
+          url: https://my-forgejo-instance.net
+          repo: myuser/myrepo
+          token: ${{ secrets.WRITE_TOKEN_TO_MYREPO }}
+          tag: v13.0.2
+          release-dir: dist/release
+          release-notes-file: dist/changelog.md
 ```
 
 ### Download

@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: MIT
+
+name: Upload a release with Release Notes to the project that runs the workflow
+on: [push]
+jobs:
+  upload-download:
+    runs-on: lxc-bookworm
+    steps:
+      - uses: actions/checkout@v6
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        id: release-notes-file
+        uses: SELF@vTest
+        with:
+          direction: upload
+          tag: v1.0
+          token: FORGEJO_TEST_TOKEN
+          release-dir: upload-dir
+          release-notes-file: upload-dir/RELEASE_NOTES.md
+          verbose: true
+
+      - uses: actions/checkout@v6
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        id: release-notes-file-takes-precedence
+        uses: SELF@vTest
+        with:
+          direction: upload
+          tag: v2.0
+          token: FORGEJO_TEST_TOKEN
+          release-dir: upload-dir
+          release-notes: "I wont be there"
+          release-notes-file: upload-dir/RELEASE_NOTES.md
+          verbose: true
+
+      - uses: actions/checkout@v6
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        id: release-notes
+        uses: SELF@vTest
+        with:
+          direction: upload
+          tag: v3.0
+          token: FORGEJO_TEST_TOKEN
+          release-dir: upload-dir
+          release-notes: "I will be there"
+          verbose: true
