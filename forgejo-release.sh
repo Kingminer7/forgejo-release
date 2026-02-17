@@ -12,8 +12,6 @@ if ${VERBOSE:-false}; then set -x; fi
 : ${DOWNLOAD_LATEST:=false}
 : ${TMP_DIR:=$(mktemp -d)}
 : ${GNUPGHOME:=$TMP_DIR}
-: ${TEA_BIN:=$TMP_DIR/tea}
-: ${TEA_VERSION:=0.10.1}
 : ${OVERRIDE:=false}
 : ${HIDE_ARCHIVE_LINK:=false}
 : ${RETRY:=1}
@@ -27,19 +25,9 @@ TAG_URL=$(echo "$TAG" | sed 's/\//%2F/g')
 
 export GNUPGHOME
 
-setup_tea() {
-    if which tea 2>/dev/null; then
-        TEA_BIN=$(which tea)
-    elif ! test -f $TEA_BIN; then
-        ARCH=$(dpkg --print-architecture)
-        curl -sL https://dl.gitea.io/tea/$TEA_VERSION/tea-$TEA_VERSION-linux-"$ARCH" >$TEA_BIN
-        chmod +x $TEA_BIN
-    fi
-}
-
 get_tag() {
     if ! test -f "$TAG_FILE"; then
-        if api GET repos/$REPO/tags/"$TAG_URL" >"$TAG_FILE"; then
+        if api_json GET repos/$REPO/tags/"$TAG_URL" >"$TAG_FILE"; then
             echo "tag $TAG exists"
         else
             echo "tag $TAG does not exists"
@@ -70,42 +58,52 @@ ensure_tag() {
 }
 
 create_tag() {
-    api POST repos/$REPO/tags --data-raw '{"tag_name": "'"$TAG"'", "target": "'"$SHA"'"}' >"$TAG_FILE"
+    api_json POST repos/$REPO/tags --data-raw '{"tag_name": "'"$TAG"'", "target": "'"$SHA"'"}' >"$TAG_FILE"
 }
 
 delete_tag() {
     if get_tag; then
-        api DELETE repos/$REPO/tags/"$TAG_URL"
+        api_json DELETE repos/$REPO/tags/"$TAG_URL"
         rm -f "$TAG_FILE"
     fi
 }
 
 upload_release() {
-    # assets is defined as a list of arguments, where values may contain whitespace and need to be quoted like this -a "my file.txt" -a "file.txt".
-    # It is expanded using "${assets[@]}" which preserves the separation of arguments and not split whitespace containing values.
-    # For reference, see https://github.com/koalaman/shellcheck/wiki/SC2086#exceptions
-    local assets=()
-    if [ "$SKIP_ASSETS" == 'false' ]; then
-        for file in "$RELEASE_DIR"/*; do
-            assets=("${assets[@]}" -a "$file")
-        done
-    fi
     if $PRERELEASE || echo "${TAG}" | grep -qi '\-rc'; then
-        releaseType="--prerelease"
+        prerelease="true"
         echo "Uploading as Pre-Release"
     else
+        prerelease="false"
         echo "Uploading as Stable"
     fi
     ensure_tag
-    if ! $TEA_BIN release create "${assets[@]}" --repo $REPO --note "$RELEASENOTES" --tag "$TAG" --title "$TITLE" --draft ${releaseType} >&"$TMP_DIR"/tea.log; then
-        if grep --quiet 'Unknown API Error: 500' "$TMP_DIR"/tea.log && grep --quiet services/release/release.go:194 "$TMP_DIR"/tea.log; then
-            echo "workaround v1.20 race condition https://codeberg.org/forgejo/forgejo/issues/1370"
-            sleep 10
-            $TEA_BIN release create "${assets[@]}" --repo $REPO --note "$RELEASENOTES" --tag "$TAG" --title "$TITLE" --draft ${releaseType}
-        else
-            cat "$TMP_DIR"/tea.log
-            return 1
+    jq -n --arg title "$TITLE" --arg body "$RELEASENOTES" --arg tag "$TAG" --arg pre $prerelease '{"draft": true, "name": $title, "body": $body, "prerelease": $pre | test("true"), "tag_name": $tag }' >"$TMP_DIR"/release-payload.json
+    if ${VERBOSE:-false}; then
+        echo "Payload:"
+        cat "$TMP_DIR"/release-payload.json | jq
+    fi
+    if ! api_json POST repos/$REPO/releases -d @"$TMP_DIR"/release-payload.json >"$TMP_DIR"/release.json; then
+        if ${VERBOSE:-false}; then
+            echo "Response:"
+            cat "$TMP_DIR"/release.json | jq
         fi
+        exit 1
+    fi
+    if [ "$SKIP_ASSETS" == 'false' ]; then
+        release_id=$(jq --raw-output .id <"$TMP_DIR"/release.json)
+        for file in "$RELEASE_DIR"/*; do
+            # https://dev.to/pkutaj/how-to-use-jq-for-uri-encoding-2o5
+            # https://unix.stackexchange.com/questions/94295/shellcheck-is-advising-not-to-use-basename-why/94307#94307
+            # url encode some chars
+            asset_name="$(echo -n "${file##*/}" | jq -sRr @uri)"
+            if ! api POST "repos/$REPO/releases/$release_id/assets?name=$asset_name" -H "Content-Type: multipart/form-data" -F "attachment=@$file" >"$TMP_DIR/release-$asset_name.json"; then
+                if ${VERBOSE:-false}; then
+                    echo "Response:"
+                    cat "$TMP_DIR/release-$asset_name.json" | jq
+                fi
+                exit 1
+            fi
+        done
     fi
     maybe_use_release_note_assistant
     release_draft false
@@ -114,9 +112,9 @@ upload_release() {
 release_draft() {
     local state="$1"
 
-    local id=$(api GET repos/$REPO/releases/tags/"$TAG_URL" | jq --raw-output .id)
+    local id=$(api_json GET repos/$REPO/releases/tags/"$TAG_URL" | jq --raw-output .id)
 
-    api PATCH repos/$REPO/releases/"$id" --data-raw '{"draft": '"$state"', "hide_archive_links": '$HIDE_ARCHIVE_LINK'}'
+    api_json PATCH repos/$REPO/releases/"$id" --data-raw '{"draft": '"$state"', "hide_archive_links": '$HIDE_ARCHIVE_LINK'}'
 }
 
 maybe_use_release_note_assistant() {
@@ -152,7 +150,7 @@ maybe_override() {
     if test "$OVERRIDE" = "false"; then
         return
     fi
-    api DELETE repos/$REPO/releases/tags/"$TAG_URL" >&/dev/null || true
+    api_json DELETE repos/$REPO/releases/tags/"$TAG_URL" >&/dev/null || true
     if get_tag && ! matched_tag; then
         delete_tag
     fi
@@ -160,9 +158,6 @@ maybe_override() {
 
 upload() {
     setup_api
-    setup_tea
-    rm -f ~/.config/tea/config.yml
-    GITEA_SERVER_TOKEN=$TOKEN $TEA_BIN login add --url $FORGEJO
     maybe_sign_release
     maybe_override
     upload_release
@@ -175,19 +170,23 @@ setup_api() {
     fi
 }
 
+api_json() {
+    api "$@" -H "Content-Type: application/json"
+}
+
 api() {
     method=$1
     shift
     path=$1
     shift
 
-    curl --fail -X "$method" -sS -H "Content-Type: application/json" -H "Authorization: token $TOKEN" "$@" $FORGEJO/api/v1/"$path"
+    curl --retry 5 --fail -X "$method" -sS -H "Authorization: token $TOKEN" "$@" $FORGEJO/api/v1/"$path"
 }
 
 wait_release() {
     local ready=false
     for i in $(seq $RETRY); do
-        if api GET repos/$REPO/releases/tags/"$TAG_URL" | jq --raw-output .draft >"$TMP_DIR"/draft; then
+        if api_json GET repos/$REPO/releases/tags/"$TAG_URL" | jq --raw-output .draft >"$TMP_DIR"/draft; then
             if test "$(cat "$TMP_DIR"/draft)" = "false"; then
                 ready=true
                 break
@@ -212,11 +211,11 @@ download() {
         cd $RELEASE_DIR
         if [[ ${DOWNLOAD_LATEST} = "true" ]]; then
             echo "Downloading the latest release"
-            api GET repos/$REPO/releases/latest >"$TMP_DIR"/assets.json
+            api_json GET repos/$REPO/releases/latest >"$TMP_DIR"/assets.json
         elif [[ ${DOWNLOAD_LATEST} == "false" ]]; then
             wait_release
             echo "Downloading tagged release ${TAG}"
-            api GET repos/$REPO/releases/tags/"$TAG_URL" >"$TMP_DIR"/assets.json
+            api_json GET repos/$REPO/releases/tags/"$TAG_URL" >"$TMP_DIR"/assets.json
         fi
         jq --raw-output '.assets[] | "\(.browser_download_url) \(.name)"' <"$TMP_DIR"/assets.json | while read url name; do # `name` may contain whitespace, therefore, it must be last
             url=$(echo "$url" | sed "s#/download/${TAG}/#/download/${TAG_URL}/#")

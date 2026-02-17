@@ -4,33 +4,17 @@
 set -ex
 PS4='${BASH_SOURCE[0]}:$LINENO: ${FUNCNAME[0]}:  '
 
-test_system_tea_bin() {
-	SYSTEM_TEA_BIN=$TMP_DIR/tea
-	touch $SYSTEM_TEA_BIN && chmod +x $SYSTEM_TEA_BIN
-	export PATH=$TMP_DIR:$PATH
-    setup_tea
-	test $TEA_BIN == $SYSTEM_TEA_BIN
-}
-
-test_download_tea_bin() {
-    # assume tea is not installed on system
-    setup_tea
-    test $TEA_BIN == $TMP_DIR/tea
-}
-
 test_teardown() {
     setup_api
-    api DELETE repos/$REPO/releases/tags/$TAG || true
-    api DELETE repos/$REPO/tags/$TAG || true
+    api_json DELETE repos/$REPO/releases/tags/$TAG || true
+    api_json DELETE repos/$REPO/tags/$TAG || true
     rm -fr dist/release
-    setup_tea
-    $TEA_BIN login delete $DOER || true
 }
 
 test_reset_repo() {
     local project="$1"
-    api DELETE repos/$REPO || true
-    api POST user/repos --data-raw '{"name":"'$project'", "auto_init":true}'
+    api_json DELETE repos/$REPO || true
+    api_json POST user/repos --data-raw '{"name":"'$project'", "auto_init":true}'
     git clone $FORGEJO/$REPO $TMP_DIR/repo
     SHA=$(git -C $TMP_DIR/repo rev-parse HEAD)
 }

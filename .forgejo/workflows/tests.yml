@@ -2,7 +2,7 @@ on:
   pull_request:
   push:
     branches:
-      - "**"
+      - '**'
 
 jobs:
   tests:
@@ -24,6 +24,4 @@ jobs:
 
       - name: Unit tests of the supporting script forgejo-release.sh
         run: |
-          testdata/forgejo-release-test.sh test_system_tea_bin
-          testdata/forgejo-release-test.sh test_download_tea_bin
           testdata/forgejo-release-test.sh test_maybe_sign_release
