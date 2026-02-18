@@ -63,7 +63,7 @@ runs:
   using: "composite"
   steps:
     - if: ${{ inputs.release-notes-assistant }}
-      uses: https://data.forgejo.org/actions/cache@v4
+      uses: actions/cache@v4
       with:
         key: rna-${{ inputs.repo }}
         path: ${{ forge.action_path }}/rna
