@@ -44,7 +44,7 @@ jobs:
     runs-on: docker
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/forgejo-release@v2.9.1
+      - uses: actions/forgejo-release@v2.11.0
         with:
           direction: upload
           url: https://my-forgejo-instance.net
@@ -65,7 +65,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Generate Changelog
         run: ./generate-changelog.sh > dist/changelog.md
-      - uses: actions/forgejo-release@v2.7.3
+      - uses: actions/forgejo-release@v2.11.0
         with:
           direction: upload
           url: https://my-forgejo-instance.net
@@ -86,7 +86,7 @@ jobs:
     runs-on: docker
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/forgejo-release@v2.9.1
+      - uses: actions/forgejo-release@v2.11.0
         with:
           direction: download
           url: https://my-forgejo-instance.net
