@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - id: forgejo
-        uses: https://code.forgejo.org/actions/setup-forgejo@v3.1.6
+        uses: https://code.forgejo.org/actions/setup-forgejo@v3.1.7
         with:
           user: testuser
           password: admin1234
