@@ -90,7 +90,7 @@ jobs:
   upload-gpg-no-passphrase:
     runs-on: docker
     container:
-      image: 'data.forgejo.org/oci/node:24-bookworm'
+      image: 'data.forgejo.org/oci/node:24-trixie'
     steps:
       - uses: actions/checkout@v6
       - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
