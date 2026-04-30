@@ -5,7 +5,7 @@ on:
       - "**"
 
 env:
-  FORGEJO_VERSION: 11.0.12 # renovate: datasource=docker depName=data.forgejo.org/forgejo/forgejo
+  FORGEJO_VERSION: 11.0.13 # renovate: datasource=docker depName=data.forgejo.org/forgejo/forgejo
 
 jobs:
   integration:
