@@ -9,18 +9,18 @@ inputs:
     default: '${{ env.FORGEJO_SERVER_URL }}'
   repo:
     description: 'owner/project relative to the URL'
-    default: '${{ forge.repository }}'
+    default: '${{ github.repository }}'
   tag:
     description: 'Tag of the release'
-    default: '${{ forge.ref_name }}'
+    default: '${{ github.ref_name }}'
   title:
     description: 'Title of the release (defaults to tag)'
   sha:
     description: 'SHA of the release'
-    default: '${{ forge.sha }}'
+    default: '${{ github.sha }}'
   token:
     description: 'Forgejo application token (must have `write:repository`)'
-    default: '${{ forge.token }}'
+    default: '${{ github.token }}'
   release-dir:
     description: 'Directory in which release assets are uploaded or downloaded'
     default: 'dist/release'
@@ -66,9 +66,9 @@ runs:
       uses: actions/cache@v4
       with:
         key: rna-${{ inputs.repo }}
-        path: ${{ forge.action_path }}/rna
+        path: ${{ github.action_path }}/rna
 
-    - run: echo "${{ forge.action_path }}" >> $FORGEJO_PATH
+    - run: echo "${{ github.action_path }}" >> $FORGEJO_PATH
       shell: bash
     - run: |
         export FORGEJO="${{ inputs.url }}"
@@ -89,7 +89,7 @@ runs:
         export PRERELEASE="${{ inputs.prerelease }}"
 
         export RELEASE_NOTES_ASSISTANT="${{ inputs.release-notes-assistant }}"
-        export RELEASE_NOTES_ASSISTANT_WORKDIR=${{ forge.action_path }}/rna
+        export RELEASE_NOTES_ASSISTANT_WORKDIR=${{ github.action_path }}/rna
 
         export HIDE_ARCHIVE_LINK="${{ inputs.hide-archive-link }}"
 
