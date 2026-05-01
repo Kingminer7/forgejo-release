@@ -6,7 +6,7 @@ description: |
 inputs:
   url:
     description: 'URL of the Forgejo instance'
-    default: '${{ env.FORGEJO_SERVER_URL }}'
+    default: '${{ runner.environment.FORGEJO_SERVER_URL }}'
   repo:
     description: 'owner/project relative to the URL'
     default: '${{ github.repository }}'
